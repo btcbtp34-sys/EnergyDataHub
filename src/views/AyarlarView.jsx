@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { 
   Settings, 
@@ -13,335 +13,343 @@ import {
   Clock, 
   Gauge, 
   Bell, 
-  FileText, 
-  UserCheck, 
   Info, 
-  RotateCcw, 
   Save, 
   Moon, 
-  Zap, 
-  Sun 
+  Sun,
+  Zap,
+  CheckCircle2
 } from 'lucide-react';
 
 export default function AyarlarView() {
   const { theme, setTheme } = useTheme();
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const handleSave = () => {
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
+  };
 
   return (
     <div className="module-view active">
-      <div className="dashboard-grid">
-        {/* Left & Middle Column (col-span-8) */}
-        <div className="col-span-8" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Row 1 */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-            {/* Genel Ayarlar */}
-            <div className="card" style={{ padding: '16px' }}>
-              <div className="card-header">
-                <div className="card-title" style={{ fontSize: '13px' }}><Settings size={16} /> Genel Ayarlar</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11px' }}>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>Zaman Dilimi</label>
-                  <select className="copilot-input" style={{ padding: '4px 8px', fontSize: '11px', width: '100%', marginTop: '2px' }}>
-                    <option>Europe/Istanbul (UTC+03:00)</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>Dil</label>
-                  <select className="copilot-input" style={{ padding: '4px 8px', fontSize: '11px', width: '100%', marginTop: '2px' }}>
-                    <option>Türkçe</option>
-                    <option>English</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>Tarih Formatı</label>
-                  <select className="copilot-input" style={{ padding: '4px 8px', fontSize: '11px', width: '100%', marginTop: '2px' }}>
-                    <option>15 May 2025 (dd MMM yyyy)</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>Sayı Formatı</label>
-                  <select className="copilot-input" style={{ padding: '4px 8px', fontSize: '11px', width: '100%', marginTop: '2px' }}>
-                    <option>1.234,56</option>
-                  </select>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Otomatik Yenileme</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <input type="checkbox" defaultChecked style={{ accentColor: 'var(--primary)' }} />
-                    <select className="copilot-input" style={{ padding: '2px 4px', fontSize: '10px' }}><option>60</option></select> saniye
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Tesis Yapısı */}
-            <div className="card" style={{ padding: '16px' }}>
-              <div className="card-header">
-                <div className="card-title" style={{ fontSize: '13px' }}><Network size={16} /> Tesis Yapısı</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11px' }}>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>Tesis</label>
-                  <select className="copilot-input" style={{ padding: '4px 8px', fontSize: '11px', width: '100%', marginTop: '2px' }}>
-                    <option>Tüm Tesisler (4)</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>Şebeke Yapısı</label>
-                  <select className="copilot-input" style={{ padding: '4px 8px', fontSize: '11px', width: '100%', marginTop: '2px' }}>
-                    <option>OG / AG</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>Gerilim Seviyeleri</label>
-                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '2px' }}>
-                    <span className="badge badge-info" style={{ fontSize: '10px' }}>OG (34,5 kV) ×</span>
-                    <span className="badge badge-info" style={{ fontSize: '10px' }}>AG (400 V) ×</span>
-                  </div>
-                </div>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>Varsayılan Görünüm</label>
-                  <select className="copilot-input" style={{ padding: '4px 8px', fontSize: '11px', width: '100%', marginTop: '2px' }}>
-                    <option>Şebeke / OG Giriş</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Birim Fiyatlar */}
-            <div className="card" style={{ padding: '16px' }}>
-              <div className="card-header">
-                <div className="card-title" style={{ fontSize: '13px' }}><Tags size={16} /> Birim Fiyatlar</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11px' }}>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>Elektrik Birim Fiyatı</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <input type="text" className="copilot-input" defaultValue="2,45" style={{ padding: '4px 8px', fontSize: '11px', flex: 1 }} />
-                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>TL/kWh</span>
-                  </div>
-                </div>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>Doğalgaz Birim Fiyatı</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <input type="text" className="copilot-input" defaultValue="9,80" style={{ padding: '4px 8px', fontSize: '11px', flex: 1 }} />
-                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>TL/Sm³</span>
-                  </div>
-                </div>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>Su Birim Fiyatı</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <input type="text" className="copilot-input" defaultValue="18,50" style={{ padding: '4px 8px', fontSize: '11px', flex: 1 }} />
-                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>TL/m³</span>
-                  </div>
-                </div>
-                <div style={{ fontSize: '10px', color: 'var(--text-dim)', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Info size={12} /> Fiyatlar KDV hariç girilmektedir.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Row 2 */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-            {/* Emisyon Katsayıları */}
-            <div className="card" style={{ padding: '16px' }}>
-              <div className="card-header">
-                <div className="card-title" style={{ fontSize: '13px' }}><Leaf size={16} /> Emisyon Katsayıları</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>CO₂ (Elektrik)</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <input type="text" className="copilot-input" defaultValue="0,421" style={{ padding: '3px 6px', fontSize: '11px', width: '60px' }} />
-                    <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>kg CO₂e/kWh</span>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>CO₂ (Doğalgaz)</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <input type="text" className="copilot-input" defaultValue="2,04" style={{ padding: '3px 6px', fontSize: '11px', width: '60px' }} />
-                    <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>kg CO₂e/Sm³</span>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>CO₂ (Yakıt)</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <input type="text" className="copilot-input" defaultValue="2,68" style={{ padding: '3px 6px', fontSize: '11px', width: '60px' }} />
-                    <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>kg CO₂e/L</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Sayaç Eşleştirme */}
-            <div className="card" style={{ padding: '16px' }}>
-              <div className="card-header">
-                <div className="card-title" style={{ fontSize: '13px' }}><Share2 size={16} /> Sayaç Eşleştirme</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Otomatik Eşleştirme</span>
-                  <input type="checkbox" defaultChecked style={{ accentColor: 'var(--primary)' }} />
-                </div>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>Eşleştirme Eşiği</label>
-                  <select className="copilot-input" style={{ padding: '3px 6px', fontSize: '11px', width: '100%', marginTop: '2px' }}>
-                    <option>%5</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>Eşleşme Kriterleri</label>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', marginTop: '4px', fontSize: '10px' }}>
-                    <label><input type="checkbox" defaultChecked /> Sayaç ID</label>
-                    <label><input type="checkbox" defaultChecked /> Lokasyon</label>
-                    <label><input type="checkbox" defaultChecked /> Cihaz Tipi</label>
-                    <label><input type="checkbox" /> Faz Bilgisi</label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* SAP Bağlantısı */}
-            <div className="card" style={{ padding: '16px' }}>
-              <div className="card-header">
-                <div className="card-title" style={{ fontSize: '13px' }}><RefreshCw size={16} /> SAP Bağlantısı</div>
-                <span className="badge badge-success" style={{ fontSize: '9px' }}>● Bağlı</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11px' }}>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>SAP Sistem</label>
-                  <select className="copilot-input" style={{ padding: '3px 6px', fontSize: '11px', width: '100%', marginTop: '2px' }}>
-                    <option>SAP_BOT (PRD)</option>
-                  </select>
-                </div>
-                <div>
-                  <label style={{ color: 'var(--text-muted)' }}>Entegrasyon Tipi</label>
-                  <select className="copilot-input" style={{ padding: '3px 6px', fontSize: '11px', width: '100%', marginTop: '2px' }}>
-                    <option>IDoc</option>
-                    <option>OData REST API</option>
-                  </select>
-                </div>
-                <button className="btn btn-outline" style={{ padding: '4px 8px', fontSize: '10px', width: '100%', marginTop: '4px' }} onClick={() => alert('SAP Bağlantı Testi Başarılı!')}>
-                  <RefreshCw size={12} /> Bağlantı Test Et
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Row 3: Theme Selector Card */}
-          <div className="card" style={{ padding: '16px' }}>
-            <div className="card-header">
-              <div className="card-title" style={{ fontSize: '13px' }}><Palette size={16} /> Arayüz Tema Seçenekleri</div>
-            </div>
-            <div className="theme-selector-grid" style={{ marginTop: '4px' }}>
-              <div 
-                className={`theme-card ${theme === 'dark' ? 'active' : ''}`}
-                onClick={() => setTheme('dark')}
-              >
-                <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Moon size={14} /> Executive Dark
-                </div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Siber mavi ve mor ışılamalı modern karanlık tema.</div>
-              </div>
-
-              <div 
-                className={`theme-card ${theme === 'yellow-black' ? 'active' : ''}`}
-                onClick={() => setTheme('yellow-black')}
-              >
-                <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Zap size={14} /> Siyah - Sarı (Cyber Gold)
-                </div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Yüksek kontrastlı siber siyah ve altın sarısı endüstriyel tema.</div>
-              </div>
-
-              <div 
-                className={`theme-card ${theme === 'light' ? 'active' : ''}`}
-                onClick={() => setTheme('light')}
-              >
-                <div style={{ fontWeight: 700, color: 'var(--text-main)', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Sun size={14} /> Beyaz (Clean Light)
-                </div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Aydınlık ve yüksek okunabilirlikte kurumsal beyaz tema.</div>
-              </div>
-            </div>
-          </div>
+      {/* Top Header & Save Actions */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-main)' }}>Platform &amp; Sistem Ayarları</h2>
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
+            Arayüz teması, tarife birim fiyatları, emisyon katsayıları ve kurumsal entegrasyon parametreleri
+          </p>
         </div>
 
-        {/* Right Column Panel */}
-        <div className="card col-span-4" style={{ padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div>
-            <div className="card-header" style={{ marginBottom: '16px' }}>
-              <div className="card-title" style={{ fontSize: '15px' }}><Sliders size={18} /> Aktif Konfigürasyon Özeti</div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <strong style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '6px' }}><Database size={14} /> Veri Kaynağı</strong>
-                  <span style={{ color: 'var(--success-text)' }}>Tüm sistemler bağlı</span>
-                </div>
-              </div>
-
-              <div style={{ borderTop: '1px solid var(--border-card)', paddingTop: '8px' }}>
-                <strong style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '6px' }}><Clock size={14} /> Son Veri Zamanı</strong>
-                <span style={{ color: 'var(--text-muted)' }}>15 May 2025 10:23:58</span>
-              </div>
-
-              <div style={{ borderTop: '1px solid var(--border-card)', paddingTop: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                <div>
-                  <strong style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '6px' }}><Gauge size={14} /> Sayaçlar</strong>
-                  <span style={{ color: 'var(--text-muted)' }}>128 / 128</span>
-                </div>
-                <span style={{ color: 'var(--success-text)', fontWeight: 700 }}>Eşleştirilmiş</span>
-              </div>
-
-              <div style={{ borderTop: '1px solid var(--border-card)', paddingTop: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                <div>
-                  <strong style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '6px' }}><Bell size={14} /> Alarmlar</strong>
-                  <span style={{ color: 'var(--danger-text)', fontWeight: 700 }}>3 aktif</span>
-                </div>
-              </div>
-
-              <div style={{ borderTop: '1px solid var(--border-card)', paddingTop: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                <div>
-                  <strong style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '6px' }}><RefreshCw size={14} /> SAP Bağlantısı</strong>
-                  <span style={{ color: 'var(--success-text)', fontWeight: 700 }}>Bağlı</span>
-                </div>
-              </div>
-
-              <div style={{ borderTop: '1px solid var(--border-card)', paddingTop: '8px' }}>
-                <strong style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '6px' }}><FileText size={14} /> Raporlar</strong>
-                <span style={{ color: 'var(--text-muted)' }}>4 şablon aktif</span>
-              </div>
-
-              <div style={{ borderTop: '1px solid var(--border-card)', paddingTop: '8px' }}>
-                <strong style={{ color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '6px' }}><UserCheck size={14} /> Son Kaydedilme</strong>
-                <span style={{ color: 'var(--text-muted)' }}>14 May 2025 16:45:12</span>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ background: 'var(--info-bg)', border: '1px solid var(--border-card)', borderRadius: '10px', padding: '12px', fontSize: '11px', color: 'var(--info-text)', marginTop: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Info size={16} /> Ayarlar otomatik olarak kaydedilmez. Değişikliklerinizi kaydetmeyi unutmayın.
-          </div>
-        </div>
-
-        {/* Bottom Action Bar */}
-        <div className="col-span-12" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-card)', padding: '16px 24px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-card)' }}>
-          <button className="btn btn-outline" style={{ fontSize: '12px' }} onClick={() => alert('Ayarlar varsayılan değerlere sıfırlandı.')}>
-            <RotateCcw size={14} /> Varsayılanlara Dön
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          {saveSuccess && (
+            <span style={{ fontSize: '13px', color: 'var(--success-text)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <CheckCircle2 size={16} /> Ayarlar başarıyla kaydedildi!
+            </span>
+          )}
+          <button className="btn btn-primary" style={{ padding: '10px 24px', fontSize: '13px' }} onClick={handleSave}>
+            <Save size={16} /> Tüm Ayarları Kaydet
           </button>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <button className="btn btn-outline" style={{ fontSize: '12px' }}>İptal</button>
-            <button className="btn btn-primary" style={{ fontSize: '12px' }} onClick={() => alert('Tüm ayarlar başarıyla kaydedildi!')}>
-              <Save size={14} /> Kaydet
-            </button>
-            <button className="btn btn-primary" style={{ background: 'linear-gradient(135deg, var(--purple, #8b5cf6), #6d28d9)', fontSize: '12px' }} onClick={() => alert('Tüm haberleşme ve SAP bağlantıları test edildi: BAŞARILI ✓')}>
-              <Network size={14} /> Tüm Bağlantıları Test Et
-            </button>
+        </div>
+      </div>
+
+      {/* Main Spacious Settings Grid */}
+      <div className="dashboard-grid">
+        
+        {/* CARD 1: Tema & Görünüm Tercihleri (col-span-12) */}
+        <div className="card col-span-12">
+          <div className="card-header">
+            <div className="card-title" style={{ fontSize: '16px' }}>
+              <Palette size={20} /> Arayüz Tema Tercihleri
+            </div>
+            <span className="badge badge-info" style={{ fontSize: '12px', padding: '6px 12px' }}>
+              Aktif Tema: {theme === 'light' ? 'Clean Light (Beyaz)' : (theme === 'dark' ? 'Executive Dark' : 'Cyber Yellow-Black')}
+            </span>
+          </div>
+
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+            Çalışma ortamınıza ve ışık şartlarınıza en uygun görsel temayı seçebilirsiniz. Değişiklik anında tüm modüllere uygulanır.
+          </p>
+
+          <div className="theme-selector-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '6px' }}>
+            
+            {/* Theme 1: Clean Light */}
+            <div 
+              className={`theme-card ${theme === 'light' ? 'active' : ''}`}
+              onClick={() => setTheme('light')}
+              style={{ padding: '20px' }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <strong style={{ fontSize: '15px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Sun size={18} color="#eab308" /> Clean Light (Kurumsal Beyaz)
+                </strong>
+                {theme === 'light' && <CheckCircle2 size={18} color="var(--primary)" />}
+              </div>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.5', marginTop: '6px' }}>
+                Yüksek kontrastlı, aydınlık ortamlara uygun, gözü yormayan beyaz ve mavi kurumsal SaaS teması.
+              </p>
+              <div style={{ display: 'flex', gap: '6px', marginTop: '10px' }}>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#ffffff', border: '1px solid #cbd5e1' }}></div>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#2563eb' }}></div>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#f8fafc', border: '1px solid #cbd5e1' }}></div>
+              </div>
+            </div>
+
+            {/* Theme 2: Executive Dark */}
+            <div 
+              className={`theme-card ${theme === 'dark' ? 'active' : ''}`}
+              onClick={() => setTheme('dark')}
+              style={{ padding: '20px' }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <strong style={{ fontSize: '15px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Moon size={18} color="#3b82f6" /> Executive Dark
+                </strong>
+                {theme === 'dark' && <CheckCircle2 size={18} color="var(--primary)" />}
+              </div>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.5', marginTop: '6px' }}>
+                Kontrol merkezleri ve gece kullanımı için tasarlanmış derin koyu mavi ve cam efekti (glassmorphism) teması.
+              </p>
+              <div style={{ display: 'flex', gap: '6px', marginTop: '10px' }}>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#080c14', border: '1px solid #334155' }}></div>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#3b82f6' }}></div>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#121a2b', border: '1px solid #334155' }}></div>
+              </div>
+            </div>
+
+            {/* Theme 3: Cyber Yellow-Black */}
+            <div 
+              className={`theme-card ${theme === 'yellow-black' ? 'active' : ''}`}
+              onClick={() => setTheme('yellow-black')}
+              style={{ padding: '20px' }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <strong style={{ fontSize: '15px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Zap size={18} color="#f59e0b" /> Cyber Yellow-Black
+                </strong>
+                {theme === 'yellow-black' && <CheckCircle2 size={18} color="var(--primary)" />}
+              </div>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.5', marginTop: '6px' }}>
+                Yüksek görünürlüklü endüstriyel siyah ve sarı uyarı renk paleti.
+              </p>
+              <div style={{ display: 'flex', gap: '6px', marginTop: '10px' }}>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#050505', border: '1px solid #3f3f46' }}></div>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#f59e0b' }}></div>
+                <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#141414', border: '1px solid #3f3f46' }}></div>
+              </div>
+            </div>
+
           </div>
         </div>
+
+        {/* CARD 2: Genel Sistem Ayarları (col-span-6) */}
+        <div className="card col-span-6">
+          <div className="card-header">
+            <div className="card-title" style={{ fontSize: '16px' }}>
+              <Settings size={18} /> Genel Sistem &amp; Bölgesel Ayarlar
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '13px' }}>
+            <div>
+              <label style={{ color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
+                Zaman Dilimi (Timezone)
+              </label>
+              <select className="copilot-input" style={{ width: '100%', padding: '10px 14px', fontSize: '13px' }}>
+                <option>Europe/Istanbul (UTC+03:00)</option>
+                <option>UTC (Coordinated Universal Time)</option>
+                <option>Europe/London (UTC+00:00)</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{ color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
+                Sistem Dili (Language)
+              </label>
+              <select className="copilot-input" style={{ width: '100%', padding: '10px 14px', fontSize: '13px' }}>
+                <option>Türkçe (Türkiye)</option>
+                <option>English (United States)</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
+                  Tarih Biçimi
+                </label>
+                <select className="copilot-input" style={{ width: '100%', padding: '10px 14px', fontSize: '13px' }}>
+                  <option>15 May 2025 (dd MMM yyyy)</option>
+                  <option>15/05/2025 (dd/MM/yyyy)</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
+                  Sayısal Ayraç
+                </label>
+                <select className="copilot-input" style={{ width: '100%', padding: '10px 14px', fontSize: '13px' }}>
+                  <option>1.234,56 (Tr standart)</option>
+                  <option>1,234.56 (US standart)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '12px', borderTop: '1px solid var(--border-card)' }}>
+              <div>
+                <strong style={{ color: 'var(--text-main)', display: 'block' }}>Canlı Veri Otomatik Yenileme</strong>
+                <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>Telemetri verilerinin polling sıklığı</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <select className="copilot-input" style={{ padding: '6px 12px', fontSize: '13px' }}>
+                  <option>15 saniye</option>
+                  <option>30 saniye</option>
+                  <option>60 saniye</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CARD 3: Birim Fiyatlar & Tarife Parametreleri (col-span-6) */}
+        <div className="card col-span-6">
+          <div className="card-header">
+            <div className="card-title" style={{ fontSize: '16px' }}>
+              <Tags size={18} /> Birim Fiyatlar &amp; Tarife Ayarları
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '13px' }}>
+            <div>
+              <label style={{ color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
+                Elektrik Birim Fiyatı
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input type="text" className="copilot-input" defaultValue="2,45" style={{ flex: 1, padding: '10px 14px', fontSize: '14px', fontWeight: 700 }} />
+                <span className="badge badge-info" style={{ fontSize: '12px', padding: '10px 14px' }}>TL / kWh</span>
+              </div>
+            </div>
+
+            <div>
+              <label style={{ color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
+                Doğalgaz Birim Fiyatı
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input type="text" className="copilot-input" defaultValue="9,80" style={{ flex: 1, padding: '10px 14px', fontSize: '14px', fontWeight: 700 }} />
+                <span className="badge badge-warning" style={{ fontSize: '12px', padding: '10px 14px' }}>TL / Sm³</span>
+              </div>
+            </div>
+
+            <div>
+              <label style={{ color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
+                Sebeke Suyu Birim Fiyatı
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input type="text" className="copilot-input" defaultValue="18,50" style={{ flex: 1, padding: '10px 14px', fontSize: '14px', fontWeight: 700 }} />
+                <span className="badge badge-neutral" style={{ fontSize: '12px', padding: '10px 14px' }}>TL / m³</span>
+              </div>
+            </div>
+
+            <div style={{ background: 'var(--bg-input)', padding: '12px 16px', borderRadius: '10px', fontSize: '12px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Info size={16} color="var(--primary)" />
+              <span>Tüm birim fiyatlar vergi (KDV ve TRT payı) hariç net maliyetler üzerinden hesaplanmaktadır.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* CARD 4: Sürdürülebilirlik & Karbon Emisyon Katsayıları (col-span-6) */}
+        <div className="card col-span-6">
+          <div className="card-header">
+            <div className="card-title" style={{ fontSize: '16px' }}>
+              <Leaf size={18} /> Sürdürülebilirlik &amp; Emisyon Katsayıları (ISO 14064)
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '13px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '8px', borderBottom: '1px solid var(--border-card)' }}>
+              <div>
+                <strong style={{ color: 'var(--text-main)', display: 'block' }}>Kapsam 2: Elektrik Şebekesi Emisyonu</strong>
+                <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>Ulusal şebeke ortalama karbon faktörü</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <input type="text" className="copilot-input" defaultValue="0,421" style={{ width: '80px', padding: '6px 10px', fontSize: '13px', textAlign: 'center', fontWeight: 700 }} />
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>kg CO₂e/kWh</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '8px', borderBottom: '1px solid var(--border-card)' }}>
+              <div>
+                <strong style={{ color: 'var(--text-main)', display: 'block' }}>Kapsam 1: Doğalgaz Yanma Emisyonu</strong>
+                <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>Doğalgaz yakılması sonucu oluşan emisyon</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <input type="text" className="copilot-input" defaultValue="2,04" style={{ width: '80px', padding: '6px 10px', fontSize: '13px', textAlign: 'center', fontWeight: 700 }} />
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>kg CO₂e/Sm³</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <strong style={{ color: 'var(--text-main)', display: 'block' }}>Kapsam 1: Dizel / Yakıt Emisyonu</strong>
+                <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>Jeneratör ve tesis içi araç yakıtı</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <input type="text" className="copilot-input" defaultValue="2,68" style={{ width: '80px', padding: '6px 10px', fontSize: '13px', textAlign: 'center', fontWeight: 700 }} />
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>kg CO₂e/L</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CARD 5: Kurumsal SAP S/4HANA Entegrasyonu (col-span-6) */}
+        <div className="card col-span-6">
+          <div className="card-header">
+            <div className="card-title" style={{ fontSize: '16px' }}>
+              <Database size={18} /> SAP S/4HANA &amp; Veritabanı Bağlantısı
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '13px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '4px' }}>SAP Host IP / Sunucu</label>
+                <input type="text" className="copilot-input" defaultValue="10.200.45.100" style={{ width: '100%', padding: '8px 12px', fontSize: '13px' }} />
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '4px' }}>System Client ID</label>
+                <input type="text" className="copilot-input" defaultValue="100 (PRD)" style={{ width: '100%', padding: '8px 12px', fontSize: '13px' }} />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '4px' }}>RFC Destination</label>
+                <input type="text" className="copilot-input" defaultValue="SAP_BTC_ENERGY_RFC" style={{ width: '100%', padding: '8px 12px', fontSize: '13px' }} />
+              </div>
+              <div>
+                <label style={{ color: 'var(--text-muted)', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Senkronizasyon Sıklığı</label>
+                <select className="copilot-input" style={{ width: '100%', padding: '8px 12px', fontSize: '13px' }}>
+                  <option>Her 15 Dakikada Bir</option>
+                  <option>Saatlik Batch</option>
+                  <option>Günlük 00:00</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid var(--border-card)' }}>
+              <span className="badge badge-success" style={{ fontSize: '12px', padding: '6px 12px' }}>
+                ● SAP Bağlantısı Sağlıklı (OK)
+              </span>
+              <button 
+                className="btn btn-outline" 
+                style={{ padding: '8px 16px', fontSize: '12px' }}
+                onClick={() => showNotification('SAP Bağlantı Testi', 'SAP S/4HANA sunucusu ile RFC ping bağlantı testi yapıldı:\nBAŞARILI (24ms ping)', 'success')}
+              >
+                <RefreshCw size={14} /> Bağlantıyı Test Et
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );

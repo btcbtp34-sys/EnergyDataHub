@@ -484,7 +484,7 @@ export default function CihazlarView() {
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px', paddingTop: '12px', borderTop: '1px solid var(--border-card)' }}>
               <button className="btn btn-outline" onClick={() => setActiveModal(null)}>İptal</button>
               <button className="btn btn-primary" onClick={() => {
-                alert(`${selectedDevice.name} konfigürasyonu kaydedildi!`);
+                showNotification('Cihaz Konfigürasyonu', `${selectedDevice.name} konfigürasyonu başarıyla kaydedildi!`, 'success');
                 setActiveModal(null);
               }}>
                 <Save size={14} /> Konfigürasyonu Kaydet

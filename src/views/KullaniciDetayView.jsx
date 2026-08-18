@@ -94,13 +94,13 @@ export default function KullaniciDetayView() {
         </div>
 
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button className="btn btn-outline" style={{ fontSize: '12px' }} onClick={() => alert('Şifre sıfırlama e-postası gönderildi!')}>
+          <button className="btn btn-outline" style={{ fontSize: '12px' }} onClick={() => showNotification('Şifre Sıfırlama', `${user.name} kullanıcısına şifre sıfırlama e-postası gönderildi.`, 'info')}>
             <Key size={14} /> Şifre Sıfırla
           </button>
-          <button className="btn btn-outline" style={{ fontSize: '12px', color: 'var(--danger-text)', borderColor: 'rgba(239, 68, 68, 0.3)' }} onClick={() => alert('Kullanıcı hesabı pasife alındı.')}>
+          <button className="btn btn-outline" style={{ fontSize: '12px', color: 'var(--danger-text)', borderColor: 'rgba(239, 68, 68, 0.3)' }} onClick={() => showNotification('Hesap Donduruldu', `${user.name} kullanıcısının hesabı pasif duruma alındı.`, 'warning')}>
             <ShieldAlert size={14} /> Hesabı Dondur
           </button>
-          <button className="btn btn-primary" style={{ fontSize: '12px' }} onClick={() => alert('Tüm kullanıcı değişiklikleri başarıyla kaydedildi!')}>
+          <button className="btn btn-primary" style={{ fontSize: '12px' }} onClick={() => showNotification('Değişiklikler Kaydedildi', `${user.name} kullanıcısının tüm modül izinleri ve profil değişiklikleri başarıyla kaydedildi!`, 'success')}>
             <Save size={14} /> Kaydet
           </button>
         </div>
@@ -338,7 +338,7 @@ export default function KullaniciDetayView() {
                 <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>Son parola değiştirilme: 45 gün önce</span>
               </div>
 
-              <button className="btn btn-outline" style={{ width: '100%', marginTop: '8px' }} onClick={() => alert('Şifre sıfırlama bağlantısı e-posta ile gönderildi.')}>
+              <button className="btn btn-outline" style={{ width: '100%', marginTop: '8px' }} onClick={() => showNotification('Şifre Yenileme', `${user.name} kullanıcısına şifre yenileme e-postası iletildi.`, 'info')}>
                 <Key size={14} /> Şifre Yenileme E-Postası Gönder
               </button>
             </div>

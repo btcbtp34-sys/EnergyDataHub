@@ -1,35 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import { 
   Chart as ChartJS, 
   CategoryScale, 
   LinearScale, 
   PointElement, 
   LineElement, 
-  BarElement, 
+  BarElement,
   ArcElement,
   Tooltip, 
   Legend, 
   Filler 
 } from 'chart.js';
-import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import { 
   Zap, 
   Flame, 
   Droplet, 
   Banknote, 
   Leaf, 
+  Bell, 
   AlertTriangle, 
-  Boxes, 
   TrendingDown, 
-  TrendingUp, 
-  LineChart, 
-  PieChart as PieIcon, 
-  Building2, 
-  BellRing, 
-  ArrowRight, 
-  AlertCircle, 
-  Gauge 
+  Activity, 
+  PieChart, 
+  Sparkles,
+  Layers,
+  ChevronRight
 } from 'lucide-react';
 
 ChartJS.register(
@@ -37,97 +34,123 @@ ChartJS.register(
   LinearScale, 
   PointElement, 
   LineElement, 
-  BarElement, 
-  ArcElement,
+  BarElement,
+  ArcElement, 
   Tooltip, 
   Legend, 
   Filler
 );
 
 export default function DashboardView() {
-  const { setActiveView, theme } = useTheme();
+  const { theme, openCopilotWithPrompt, setActiveView } = useTheme();
+  const [trendMetric, setTrendMetric] = useState('energy'); // 'energy' or 'cost'
+  const [distributionTab, setDistributionTab] = useState('type'); // 'type' or 'lines'
 
   const isLight = theme === 'light';
   const textColor = isLight ? '#475569' : (theme === 'yellow-black' ? '#d4d4d8' : '#94a3b8');
   const gridColor = isLight ? '#e2e8f0' : 'rgba(255, 255, 255, 0.05)';
 
-  const commonOptions = {
+  // Main Hero Trend Chart Data
+  const energyTrendData = {
+    labels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
+    datasets: [
+      {
+        label: 'Elektrik Yoğunluğu (kWh/ton)',
+        data: [362.4, 355.0, 348.2, 342.6, 339.8, 341.2, 342.6],
+        borderColor: '#2563eb',
+        backgroundColor: (context) => {
+          const ctx = context.chart.ctx;
+          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+          gradient.addColorStop(0, 'rgba(37, 99, 235, 0.25)');
+          gradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
+          return gradient;
+        },
+        fill: true,
+        tension: 0.4,
+        borderWidth: 3,
+        pointBackgroundColor: '#2563eb',
+        pointRadius: 4,
+        pointHoverRadius: 7
+      },
+      {
+        label: 'Aylık Hedef (350 kWh/ton)',
+        data: [350, 350, 350, 350, 350, 350, 350],
+        borderColor: isLight ? '#cbd5e1' : 'rgba(255, 255, 255, 0.2)',
+        borderDash: [6, 6],
+        fill: false,
+        pointRadius: 0,
+        borderWidth: 2
+      }
+    ]
+  };
+
+  const costTrendData = {
+    labels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
+    datasets: [
+      {
+        label: 'BirimÜrün Maliyeti (TL/ton)',
+        data: [208.5, 201.3, 195.4, 186.7, 184.2, 185.0, 186.7],
+        borderColor: '#7c3aed',
+        backgroundColor: (context) => {
+          const ctx = context.chart.ctx;
+          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+          gradient.addColorStop(0, 'rgba(124, 58, 237, 0.25)');
+          gradient.addColorStop(1, 'rgba(124, 58, 237, 0.0)');
+          return gradient;
+        },
+        fill: true,
+        tension: 0.4,
+        borderWidth: 3,
+        pointBackgroundColor: '#7c3aed',
+        pointRadius: 4,
+        pointHoverRadius: 7
+      }
+    ]
+  };
+
+  const trendChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: false }
+      legend: {
+        position: 'top',
+        align: 'end',
+        labels: { color: textColor, font: { family: 'Plus Jakarta Sans', size: 12, weight: '600' } }
+      },
+      tooltip: {
+        backgroundColor: isLight ? '#0f172a' : '#1e293b',
+        titleFont: { family: 'Plus Jakarta Sans', size: 13, weight: '700' },
+        bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
+        padding: 12,
+        cornerRadius: 10
+      }
     },
     scales: {
-      x: { ticks: { color: textColor }, grid: { color: gridColor } },
-      y: { ticks: { color: textColor }, grid: { color: gridColor } }
+      x: { ticks: { color: textColor, font: { family: 'Plus Jakarta Sans', size: 12 } }, grid: { color: gridColor } },
+      y: { ticks: { color: textColor, font: { family: 'Plus Jakarta Sans', size: 12 } }, grid: { color: gridColor } }
     }
   };
 
-  // Energy Density Line Chart Data
-  const energyDensityData = {
-    labels: ['09 May', '10 May', '11 May', '12 May', '13 May', '14 May', '15 May'],
+  // Distribution Chart Data
+  const energyTypeData = {
+    labels: ['Elektrik', 'Doğalgaz', 'Su'],
     datasets: [
       {
-        label: 'kWh/ton',
-        data: [415, 385, 350, 320, 318, 298, 342.6],
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-        fill: true,
-        tension: 0.4,
-        borderWidth: 3,
-        pointBackgroundColor: '#3b82f6',
-        pointRadius: 4
-      },
-      {
-        label: '7 Günlük Ort.',
-        data: [380, 375, 360, 350, 340, 335, 332],
-        borderColor: '#64748b',
-        borderDash: [4, 4],
-        borderWidth: 1.5,
-        pointRadius: 0
+        data: [61, 28, 11],
+        backgroundColor: ['#2563eb', '#f59e0b', '#06b6d4'],
+        borderWidth: 0,
+        hoverOffset: 6
       }
     ]
   };
 
-  // Cost Density Line Chart Data
-  const costDensityData = {
-    labels: ['09 May', '10 May', '11 May', '12 May', '13 May', '14 May', '15 May'],
+  const lineDensityData = {
+    labels: ['Hat-1 Döküm', 'Hat-2 İşleme', 'Hat-3 Montaj', 'Hat-4 Paketleme'],
     datasets: [
       {
-        label: 'TL/ton',
-        data: [305, 280, 255, 228, 205, 182, 186.7],
-        borderColor: '#8b5cf6',
-        backgroundColor: 'rgba(139, 92, 246, 0.2)',
-        fill: true,
-        tension: 0.4,
-        borderWidth: 3,
-        pointBackgroundColor: '#8b5cf6',
-        pointRadius: 4
-      }
-    ]
-  };
-
-  // Consumption Donut Data
-  const donutData = {
-    labels: ['Elektrik (%61,2)', 'Doğalgaz (%27,4)', 'Su (%8,6)', 'Basınçlı Hava (%2,8)'],
-    datasets: [
-      {
-        data: [765, 342, 108, 35],
-        backgroundColor: ['#3b82f6', '#f97316', '#06b6d4', '#10b981'],
-        borderWidth: 3,
-        borderColor: 'transparent'
-      }
-    ]
-  };
-
-  // Line Density Bar Data
-  const barData = {
-    labels: ['Hat-1', 'Hat-2', 'Hat-3'],
-    datasets: [
-      {
-        label: 'kWh/ton',
-        data: [312.5, 356.8, 318.6],
-        backgroundColor: ['#3b82f6', '#ea580c', '#10b981'],
+        label: 'Tüketim (Sm³/ton)',
+        data: [21.4, 28.7, 16.2, 12.8],
+        backgroundColor: ['#2563eb', '#ef4444', '#10b981', '#7c3aed'],
         borderRadius: 8
       }
     ]
@@ -135,195 +158,274 @@ export default function DashboardView() {
 
   return (
     <div className="module-view active">
-      {/* Top Metrics Cards Row */}
-      <div className="metrics-grid">
-        <div className="metric-card">
-          <div className="metric-header">
+      {/* 6 EXECUTIVE KPI METRIC CARDS ROW */}
+      <div className="metrics-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+        
+        {/* Card 1: Elektrik Yoğunluğu */}
+        <div className="metric-card" style={{ padding: '18px 20px', gap: '8px' }}>
+          <div className="metric-header" style={{ fontSize: '12px' }}>
             <span>Elektrik Yoğunluğu</span>
-            <div className="metric-icon blue"><Zap size={18} /></div>
+            <div className="metric-icon blue" style={{ width: '32px', height: '32px' }}><Zap size={16} /></div>
           </div>
           <div className="metric-value-box">
-            <span className="metric-value">342,6</span>
-            <span className="metric-unit">kWh/ton</span>
+            <span className="metric-value" style={{ fontSize: '26px' }}>342,6</span>
+            <span className="metric-unit" style={{ fontSize: '11px' }}>kWh/ton</span>
           </div>
-          <div className="metric-subtext">
-            <span className="trend-down"><TrendingDown size={14} style={{ display: 'inline' }} /> %6,8</span> dün 367,7 kWh/ton
+          <div className="metric-subtext" style={{ fontSize: '11px' }}>
+            <span className="trend-down"><TrendingDown size={13} style={{ display: 'inline', marginRight: '2px' }} /> %6,8</span>
+            <span>dün 367,7</span>
           </div>
         </div>
 
-        <div className="metric-card">
-          <div className="metric-header">
+        {/* Card 2: Doğalgaz Yoğunluğu */}
+        <div className="metric-card" style={{ padding: '18px 20px', gap: '8px' }}>
+          <div className="metric-header" style={{ fontSize: '12px' }}>
             <span>Doğalgaz Yoğunluğu</span>
-            <div className="metric-icon orange"><Flame size={18} /></div>
+            <div className="metric-icon orange" style={{ width: '32px', height: '32px' }}><Flame size={16} /></div>
           </div>
           <div className="metric-value-box">
-            <span className="metric-value">21,8</span>
-            <span className="metric-unit">Sm³/ton</span>
+            <span className="metric-value" style={{ fontSize: '26px' }}>21,8</span>
+            <span className="metric-unit" style={{ fontSize: '11px' }}>Sm³/ton</span>
           </div>
-          <div className="metric-subtext">
-            <span className="trend-down"><TrendingDown size={14} style={{ display: 'inline' }} /> %4,3</span> dün 22,8 Sm³/ton
+          <div className="metric-subtext" style={{ fontSize: '11px' }}>
+            <span className="trend-down"><TrendingDown size={13} style={{ display: 'inline', marginRight: '2px' }} /> %4,3</span>
+            <span>dün 22,8</span>
           </div>
         </div>
 
-        <div className="metric-card">
-          <div className="metric-header">
+        {/* Card 3: Su Yoğunluğu */}
+        <div className="metric-card" style={{ padding: '18px 20px', gap: '8px' }}>
+          <div className="metric-header" style={{ fontSize: '12px' }}>
             <span>Su Yoğunluğu</span>
-            <div className="metric-icon cyan"><Droplet size={18} /></div>
+            <div className="metric-icon cyan" style={{ width: '32px', height: '32px' }}><Droplet size={16} /></div>
           </div>
           <div className="metric-value-box">
-            <span className="metric-value">0,86</span>
-            <span className="metric-unit">m³/ton</span>
+            <span className="metric-value" style={{ fontSize: '26px' }}>0,86</span>
+            <span className="metric-unit" style={{ fontSize: '11px' }}>m³/ton</span>
           </div>
-          <div className="metric-subtext">
-            <span className="trend-down"><TrendingDown size={14} style={{ display: 'inline' }} /> %5,1</span> dün 0,91 m³/ton
+          <div className="metric-subtext" style={{ fontSize: '11px' }}>
+            <span className="trend-down"><TrendingDown size={13} style={{ display: 'inline', marginRight: '2px' }} /> %5,1</span>
+            <span>dün 0,91</span>
           </div>
         </div>
 
-        <div className="metric-card">
-          <div className="metric-header">
+        {/* Card 4: Enerji Maliyeti */}
+        <div className="metric-card" style={{ padding: '18px 20px', gap: '8px' }}>
+          <div className="metric-header" style={{ fontSize: '12px' }}>
             <span>Enerji Maliyeti</span>
-            <div className="metric-icon purple"><Banknote size={18} /></div>
+            <div className="metric-icon purple" style={{ width: '32px', height: '32px' }}><Banknote size={16} /></div>
           </div>
           <div className="metric-value-box">
-            <span className="metric-value">186,7</span>
-            <span className="metric-unit">TL/ton</span>
+            <span className="metric-value" style={{ fontSize: '26px' }}>186,7</span>
+            <span className="metric-unit" style={{ fontSize: '11px' }}>TL/ton</span>
           </div>
-          <div className="metric-subtext">
-            <span className="trend-down"><TrendingDown size={14} style={{ display: 'inline' }} /> %7,2</span> dün 201,3 TL/ton
+          <div className="metric-subtext" style={{ fontSize: '11px' }}>
+            <span className="trend-down"><TrendingDown size={13} style={{ display: 'inline', marginRight: '2px' }} /> %7,2</span>
+            <span>dün 201,3</span>
           </div>
         </div>
 
-        <div className="metric-card">
-          <div className="metric-header">
+        {/* Card 5: Karbon Yoğunluğu */}
+        <div className="metric-card" style={{ padding: '18px 20px', gap: '8px' }}>
+          <div className="metric-header" style={{ fontSize: '12px' }}>
             <span>Karbon Yoğunluğu</span>
-            <div className="metric-icon green"><Leaf size={18} /></div>
+            <div className="metric-icon green" style={{ width: '32px', height: '32px' }}><Leaf size={16} /></div>
           </div>
           <div className="metric-value-box">
-            <span className="metric-value">142,3</span>
-            <span className="metric-unit">kg CO₂e/ton</span>
+            <span className="metric-value" style={{ fontSize: '26px' }}>142,3</span>
+            <span className="metric-unit" style={{ fontSize: '10px' }}>kg CO₂e/ton</span>
           </div>
-          <div className="metric-subtext">
-            <span className="trend-down"><TrendingDown size={14} style={{ display: 'inline' }} /> %6,4</span> dün 152,1 kg CO₂e/ton
+          <div className="metric-subtext" style={{ fontSize: '11px' }}>
+            <span className="trend-down"><TrendingDown size={13} style={{ display: 'inline', marginRight: '2px' }} /> %6,4</span>
+            <span>dün 152,1</span>
           </div>
         </div>
 
-        <div className="metric-card">
-          <div className="metric-header">
+        {/* Card 6: Aktif Anomali */}
+        <div className="metric-card" style={{ padding: '18px 20px', gap: '8px' }}>
+          <div className="metric-header" style={{ fontSize: '12px' }}>
             <span>Aktif Anomali</span>
-            <div className="metric-icon red"><AlertTriangle size={18} /></div>
+            <div className="metric-icon red" style={{ width: '32px', height: '32px' }}><Bell size={16} /></div>
           </div>
           <div className="metric-value-box">
-            <span className="metric-value" style={{ color: 'var(--danger-text)' }}>3</span>
-            <span className="metric-unit">adet</span>
+            <span className="metric-value" style={{ fontSize: '26px', color: 'var(--danger-text)' }}>5</span>
+            <span className="metric-unit" style={{ fontSize: '11px' }}>Sapma</span>
           </div>
-          <div className="metric-subtext" style={{ color: 'var(--danger-text)' }}>
-            2 kritik + 1 uyarı
+          <div className="metric-subtext" style={{ fontSize: '11px' }}>
+            <span style={{ color: 'var(--danger-text)', fontWeight: 700 }}>1 kritik</span> + 2 yüksek + 2 orta
           </div>
+        </div>
+
+      </div>
+
+      {/* MAIN HERO INTERACTIVE CHART (col-span-12) */}
+      <div className="card col-span-12">
+        <div className="card-header" style={{ flexWrap: 'wrap', gap: '12px' }}>
+          <div className="card-title">
+            <Activity size={20} /> Kurumsal Enerji &amp; Maliyet Performans Trendi
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Metric Tab Pills */}
+            <div style={{ display: 'flex', background: 'var(--bg-input)', padding: '4px', borderRadius: '10px', gap: '4px' }}>
+              <button 
+                className={`tab-pill-btn ${trendMetric === 'energy' ? 'active' : ''}`}
+                onClick={() => setTrendMetric('energy')}
+              >
+                <Zap size={14} style={{ display: 'inline', marginRight: '4px' }} /> Enerji Yoğunluğu
+              </button>
+              <button 
+                className={`tab-pill-btn ${trendMetric === 'cost' ? 'active' : ''}`}
+                onClick={() => setTrendMetric('cost')}
+              >
+                <Banknote size={14} style={{ display: 'inline', marginRight: '4px' }} /> Birim Maliyet
+              </button>
+            </div>
+
+            {/* Time Filter Pills */}
+            <div style={{ display: 'flex', gap: '4px' }}>
+              <button className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '11px' }}>Son 7 Gün</button>
+              <button className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '11px' }}>Son 30 Gün</button>
+            </div>
+          </div>
+        </div>
+
+        <div className="chart-container" style={{ height: '320px' }}>
+          <Line 
+            data={trendMetric === 'energy' ? energyTrendData : costTrendData} 
+            options={trendChartOptions} 
+          />
         </div>
       </div>
 
-      {/* Main Dashboard Grid */}
+      {/* BOTTOM SPLIT SECTION (col-span-12) */}
       <div className="dashboard-grid">
-        {/* Daily Production */}
-        <div className="card col-span-3">
+        {/* Left: Tüketim Dağılımı (col-span-7) */}
+        <div className="card col-span-7">
           <div className="card-header">
-            <div className="card-title"><Boxes size={18} /> Günlük Üretim</div>
+            <div className="card-title">
+              <PieChart size={18} /> Tüketim Dağılımı &amp; Hat Analizi
+            </div>
+            <div style={{ display: 'flex', background: 'var(--bg-input)', padding: '3px', borderRadius: '8px', gap: '4px' }}>
+              <button 
+                className={`tab-pill-btn ${distributionTab === 'type' ? 'active' : ''}`}
+                onClick={() => setDistributionTab('type')}
+                style={{ fontSize: '11px', padding: '4px 10px' }}
+              >
+                Enerji Türü
+              </button>
+              <button 
+                className={`tab-pill-btn ${distributionTab === 'lines' ? 'active' : ''}`}
+                onClick={() => setDistributionTab('lines')}
+                style={{ fontSize: '11px', padding: '4px 10px' }}
+              >
+                Hat Bazlı
+              </button>
+            </div>
           </div>
-          <div style={{ fontSize: '36px', fontWeight: 800, color: 'var(--text-main)' }}>
-            80 <span style={{ fontSize: '16px', fontWeight: 500, color: 'var(--text-muted)' }}>ton</span>
-          </div>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Hedef: 100 ton</div>
-          <div style={{ width: '100%', background: 'var(--bg-input)', height: '10px', borderRadius: '999px', overflow: 'hidden', marginTop: '6px' }}>
-            <div style={{ width: '80%', background: 'linear-gradient(90deg, var(--primary), var(--primary-hover))', height: '100%', borderRadius: '999px' }}></div>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginTop: '8px' }}>
-            <span style={{ color: 'var(--text-muted)' }}>Dün 76 ton</span>
-            <span className="trend-down"><TrendingUp size={14} style={{ display: 'inline' }} /> %5,3</span>
-          </div>
+
+          {distributionTab === 'type' ? (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', height: '240px', flexWrap: 'wrap' }}>
+              <div style={{ width: '200px', height: '200px' }}>
+                <Doughnut 
+                  data={energyTypeData} 
+                  options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} 
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#2563eb' }}></div>
+                  <span style={{ color: 'var(--text-muted)' }}>Elektrik Tüketimi:</span>
+                  <strong style={{ color: 'var(--text-main)' }}>%61 (27,4 MWh)</strong>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#f59e0b' }}></div>
+                  <span style={{ color: 'var(--text-muted)' }}>Doğalgaz Tüketimi:</span>
+                  <strong style={{ color: 'var(--text-main)' }}>%28 (2.296 Sm³)</strong>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#06b6d4' }}></div>
+                  <span style={{ color: 'var(--text-muted)' }}>Su Tüketimi:</span>
+                  <strong style={{ color: 'var(--text-main)' }}>%11 (180 m³)</strong>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ height: '240px' }}>
+              <Bar 
+                data={lineDensityData} 
+                options={{ 
+                  responsive: true, 
+                  maintainAspectRatio: false, 
+                  plugins: { legend: { display: false } },
+                  scales: {
+                    x: { ticks: { color: textColor }, grid: { display: false } },
+                    y: { ticks: { color: textColor }, grid: { color: gridColor } }
+                  }
+                }} 
+              />
+            </div>
+          )}
         </div>
 
-        {/* Energy Density Trend Chart */}
+        {/* Right: Kritik Sapma ve Aksiyon Akışı (col-span-5) */}
         <div className="card col-span-5">
           <div className="card-header">
-            <div className="card-title"><LineChart size={18} /> Enerji Yoğunluğu (kWh/ton)</div>
-          </div>
-          <div className="chart-container">
-            <Line data={energyDensityData} options={commonOptions} />
-          </div>
-        </div>
-
-        {/* Cost Density Trend Chart */}
-        <div className="card col-span-4">
-          <div className="card-header">
-            <div className="card-title"><TrendingUp size={18} /> Maliyet Yoğunluğu (TL/ton)</div>
-          </div>
-          <div className="chart-container">
-            <Line data={costDensityData} options={commonOptions} />
-          </div>
-        </div>
-
-        {/* Consumption Donut */}
-        <div className="card col-span-4">
-          <div className="card-header">
-            <div className="card-title"><PieIcon size={18} /> Tüketim Dağılımı (kWh eşdeğeri)</div>
-          </div>
-          <div className="chart-container">
-            <Doughnut 
-              data={donutData} 
-              options={{ 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { position: 'bottom', labels: { color: textColor } } } 
-              }} 
-            />
-          </div>
-        </div>
-
-        {/* Line Energy Density Bar */}
-        <div className="card col-span-4">
-          <div className="card-header">
-            <div className="card-title"><Building2 size={18} /> Hat Bazlı Enerji Yoğunluğu</div>
-          </div>
-          <div className="chart-container">
-            <Bar data={barData} options={commonOptions} />
-          </div>
-        </div>
-
-        {/* Recent Anomalies Widget */}
-        <div className="card col-span-4">
-          <div className="card-header">
-            <div className="card-title"><BellRing size={18} /> Son Anomaliler</div>
+            <div className="card-title">
+              <AlertTriangle size={18} color="var(--warning-text)" /> Kritik Sapma ve Aksiyonlar
+            </div>
             <button 
               className="btn btn-outline" 
-              style={{ fontSize: '11px', padding: '5px 10px' }}
+              style={{ fontSize: '11px', padding: '4px 10px' }}
               onClick={() => setActiveView('anomaliler')}
             >
-              Tümünü Gör <ArrowRight size={14} />
+              Tüm Anomaliler <ChevronRight size={14} />
             </button>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ background: 'var(--danger-bg)', borderLeft: '4px solid var(--danger)', padding: '12px', borderRadius: '8px', fontSize: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, color: 'var(--danger-text)' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><AlertCircle size={14} /> Hat-2 Doğalgaz Yoğunluğu Yüksek</span>
-                <span className="mono">10:21</span>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ background: 'var(--danger-bg)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <strong style={{ color: 'var(--danger-text)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Flame size={16} /> Hat-2 Doğalgaz Yoğunluğu
+                </strong>
+                <span className="badge badge-danger">Yüksek Sapma</span>
               </div>
-              <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>Doğalgaz yoğunluğu 28.7 Sm³/ton ile eşik değerin %32 üzerinde.</div>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                Anlık tüketim <strong>28,7 Sm³/ton</strong> seviyesindedir. İzin verilen maksimum limitin %32 üzerindedir.
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid rgba(239, 68, 68, 0.15)' }}>
+                <span style={{ fontSize: '11px', color: 'var(--danger-text)', fontWeight: 700 }}>Finansal Etki: ₺217,800/ay</span>
+                <button 
+                  className="btn btn-primary" 
+                  style={{ fontSize: '11px', padding: '4px 10px', background: 'var(--danger)', borderColor: 'var(--danger)' }}
+                  onClick={() => openCopilotWithPrompt('Hat-2 doğalgaz anomalisi için aksiyon oluştur')}
+                >
+                  <Sparkles size={13} /> Copilot ile Çöz
+                </button>
+              </div>
             </div>
 
-            <div style={{ background: 'var(--danger-bg)', borderLeft: '4px solid var(--danger)', padding: '12px', borderRadius: '8px', fontSize: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, color: 'var(--danger-text)' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Gauge size={14} /> Kompresör-2 Basınç Düşük</span>
-                <span className="mono">10:15</span>
+            <div style={{ background: 'var(--warning-bg)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <strong style={{ color: 'var(--warning-text)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Layers size={16} /> Kompresör-2 Basınç Düşüşü
+                </strong>
+                <span className="badge badge-warning">Kaçak Riski</span>
               </div>
-              <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>Basınç 4,1 bar ile minimum eşik değerin altında.</div>
-            </div>
-
-            <div style={{ background: 'var(--warning-bg)', borderLeft: '4px solid var(--warning)', padding: '12px', borderRadius: '8px', fontSize: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, color: 'var(--warning-text)' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><AlertTriangle size={14} /> Hat-1 Enerji Yoğunluğu Arttı</span>
-                <span className="mono">09:58</span>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                Çıkış basıncı <strong>4,1 bar</strong> seviyesinde. Hatlarda muhtemel hava kaçakları tespit edildi.
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid rgba(245, 158, 11, 0.15)' }}>
+                <span style={{ fontSize: '11px', color: 'var(--warning-text)', fontWeight: 700 }}>Finansal Etki: ₺148,300/ay</span>
+                <button 
+                  className="btn btn-outline" 
+                  style={{ fontSize: '11px', padding: '4px 10px' }}
+                  onClick={() => openCopilotWithPrompt('Kompresör hava kaçakları analizi')}
+                >
+                  <Sparkles size={13} /> İncele
+                </button>
               </div>
-              <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>Enerji yoğunluğu son 1 saatte %12 arttı.</div>
             </div>
           </div>
         </div>

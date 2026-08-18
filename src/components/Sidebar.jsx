@@ -22,7 +22,7 @@ export default function Sidebar() {
     { id: 'canli-veri', label: 'Canlı Veri', icon: Activity },
     { id: 'tek-hat', label: 'Tek Hat Şeması', icon: Network },
     { id: 'kpi', label: 'KPI Analizi', icon: TrendingUp },
-    { id: 'anomaliler', label: 'Anomaliler', icon: AlertTriangle, badge: '3' },
+    { id: 'anomaliler', label: 'Anomaliler', icon: AlertTriangle, badge: '5' },
     { id: 'sap', label: 'SAP & Raporlar', icon: RefreshCw },
     { id: 'alarmlar', label: 'Alarm Yönetimi', icon: Bell },
     { id: 'cihazlar', label: 'Cihazlar & Loglar', icon: Cpu },

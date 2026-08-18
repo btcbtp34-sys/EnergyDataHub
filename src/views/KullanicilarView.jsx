@@ -290,7 +290,7 @@ const initialUsers = [
 ];
 
 export default function KullanicilarView() {
-  const { setActiveView, setSelectedUser } = useTheme();
+  const { setActiveView, setSelectedUser, showNotification } = useTheme();
   const [users] = useState(initialUsers);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -375,21 +375,21 @@ export default function KullanicilarView() {
             <button 
               className="btn btn-primary" 
               style={{ fontSize: '12px' }}
-              onClick={() => alert('Yeni kullanıcı ekleme formu açılıyor...')}
+              onClick={() => showNotification('Yeni Kullanıcı', 'Yeni kullanıcı kaydetme modülü açılıyor...', 'info')}
             >
               <Plus size={16} /> Yeni Kullanıcı
             </button>
             <button 
               className="btn btn-outline" 
               style={{ fontSize: '12px' }}
-              onClick={() => alert('Davet gönderme ekranı açılıyor...')}
+              onClick={() => showNotification('Davet Gönder', 'Toplu e-posta davet bağlantısı oluşturuldu.', 'info')}
             >
               <Mail size={15} /> Davet Gönder
             </button>
             <button 
               className="btn btn-outline" 
               style={{ fontSize: '12px' }}
-              onClick={() => alert('Toplu rol atama aracı açılıyor...')}
+              onClick={() => showNotification('Rol Atama', 'Toplu rol ve yetki matrisi düzenleme aracı açılıyor...', 'info')}
             >
               <UserPlus size={15} /> Rol Ata
             </button>
@@ -491,7 +491,7 @@ export default function KullanicilarView() {
                       <button 
                         className="btn-icon" 
                         style={{ width: '28px', height: '28px' }}
-                        onClick={() => alert(`${user.name} hızlı menü...`)}
+                        onClick={() => showNotification('Kullanıcı İşlemleri', `${user.name} için hızlı eylemler seçildi.`, 'info')}
                       >
                         <MoreVertical size={14} />
                       </button>

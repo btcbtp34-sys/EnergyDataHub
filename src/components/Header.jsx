@@ -36,10 +36,10 @@ export default function Header() {
         </div>
 
         <div className="user-profile">
-          <div className="user-avatar">EY</div>
+          <div className="user-avatar">HK</div>
           <div className="user-info">
-            <span className="user-name">Enerji Yöneticisi</span>
-            <span className="user-role">Sistem Yöneticisi</span>
+            <span className="user-name">Hasan Cavit Koçak</span>
+            <span className="user-role">Enerji Yöneticisi</span>
           </div>
         </div>
       </div>
