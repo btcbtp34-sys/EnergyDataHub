@@ -34,7 +34,9 @@ import {
   Sliders,
   Radio,
   FileText,
-  TrendingUp
+  TrendingUp,
+  SlidersHorizontal,
+  Layers
 } from 'lucide-react';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
@@ -51,10 +53,10 @@ const devicesList = [
 ];
 
 export default function CihazlarView() {
-  const { theme } = useTheme();
-  const [selectedDevice, setSelectedDevice] = useState(devicesList[0]);
+  const { theme, showNotification } = useTheme();
+  const [selectedDevice, setSelectedDevice] = useState(null); // null when modal closed
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeModal, setActiveModal] = useState(null); // 'details', 'charts', 'settings', or null
+  const [modalTab, setModalTab] = useState('telemetry'); // 'telemetry', 'registers', 'charts', 'settings'
 
   const isLight = theme === 'light';
   const textColor = isLight ? '#475569' : (theme === 'yellow-black' ? '#d4d4d8' : '#94a3b8');
@@ -67,31 +69,40 @@ export default function CihazlarView() {
   );
 
   // Dynamic Chart Data for selected device
-  const chartData = {
+  const chartData = selectedDevice ? {
     labels: ['09:00', '09:15', '09:30', '09:45', '10:00', '10:15', '10:30'],
     datasets: [
       {
         label: `${selectedDevice.name} Telemetri Çekiş Trendi`,
         data: [1.12, 1.15, 1.18, 1.25, 1.22, 1.24, 1.25],
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 130, 246, 0.15)',
+        borderColor: '#1d4ed8',
+        backgroundColor: 'rgba(29, 78, 216, 0.12)',
         fill: true,
         tension: 0.4,
         borderWidth: 3,
-        pointBackgroundColor: '#3b82f6',
+        pointBackgroundColor: '#1d4ed8',
         pointRadius: 5
       }
     ]
-  };
+  } : null;
 
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 1400,
+      easing: 'easeOutQuart'
+    },
     plugins: { legend: { display: false } },
     scales: {
       x: { ticks: { color: textColor }, grid: { color: gridColor } },
       y: { ticks: { color: textColor }, grid: { color: gridColor } }
     }
+  };
+
+  const handleOpenDeviceDetail = (device, initialTab = 'telemetry') => {
+    setSelectedDevice(device);
+    setModalTab(initialTab);
   };
 
   return (
@@ -101,7 +112,7 @@ export default function CihazlarView() {
         <div className="metric-card">
           <div className="metric-header"><span>Toplam Cihaz</span><div className="metric-icon blue"><Box size={18} /></div></div>
           <div className="metric-value-box"><span className="metric-value">154</span></div>
-          <div className="metric-subtext">Tüm lokasyonlarda</div>
+          <div className="metric-subtext">Tüm saha lokasyonlarında</div>
         </div>
 
         <div className="metric-card">
@@ -119,31 +130,31 @@ export default function CihazlarView() {
         <div className="metric-card">
           <div className="metric-header"><span>Son Veri Zamanı</span><div className="metric-icon purple"><Clock size={18} /></div></div>
           <div className="metric-value-box"><span className="metric-value" style={{ fontSize: '24px' }}>10:24:30</span></div>
-          <div className="metric-subtext">15 May 2025</div>
+          <div className="metric-subtext">Canlı Polling Aktif</div>
         </div>
       </div>
 
       <div className="dashboard-grid">
-        {/* Cihazlar List Table */}
-        <div className="card col-span-7">
+        {/* Full-width Cihazlar List Table (col-span-12) */}
+        <div className="card col-span-12">
           <div className="card-header">
-            <div className="card-title"><Cpu size={18} /> Cihazlar</div>
+            <div className="card-title"><Cpu size={18} /> Saha Cihazları ve Telemetri Listeniz</div>
             <div style={{ display: 'flex', gap: '8px' }}>
               <input 
                 type="text" 
                 className="copilot-input" 
-                placeholder="Cihaz adı ara..." 
+                placeholder="Cihaz adı, IP veya lokasyon ara..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ padding: '6px 12px', fontSize: '12px', width: '160px' }} 
+                style={{ padding: '6px 14px', fontSize: '12px', width: '240px' }} 
               />
-              <button className="btn btn-outline" style={{ padding: '6px 10px', fontSize: '12px' }}><Search size={14} /></button>
-              <button className="btn btn-outline" style={{ padding: '6px 10px', fontSize: '12px' }}><Filter size={14} /></button>
+              <button className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '12px' }}><Search size={14} /></button>
+              <button className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '12px' }}><Filter size={14} /></button>
             </div>
           </div>
 
           <div className="table-responsive">
-            <table className="custom-table" style={{ fontSize: '12px' }}>
+            <table className="custom-table" style={{ fontSize: '13px' }}>
               <thead>
                 <tr>
                   <th>Cihaz Adı</th>
@@ -153,19 +164,16 @@ export default function CihazlarView() {
                   <th>Durum</th>
                   <th>Veri Kalitesi</th>
                   <th>Kalibrasyon Tarihi</th>
+                  <th style={{ textAlign: 'right' }}>İşlem</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredDevices.map((device) => {
-                  const isSelected = device.id === selectedDevice.id;
                   return (
                     <tr 
                       key={device.id} 
-                      style={{ 
-                        background: isSelected ? 'var(--primary-light)' : undefined, 
-                        cursor: 'pointer' 
-                      }}
-                      onClick={() => setSelectedDevice(device)}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => handleOpenDeviceDetail(device, 'telemetry')}
                     >
                       <td>
                         <strong>
@@ -188,6 +196,15 @@ export default function CihazlarView() {
                         %{device.quality}
                       </td>
                       <td>{device.calibDate}</td>
+                      <td style={{ textAlign: 'right' }} onClick={(e) => e.stopPropagation()}>
+                        <button 
+                          className="btn btn-primary" 
+                          style={{ padding: '4px 12px', fontSize: '11px' }}
+                          onClick={() => handleOpenDeviceDetail(device, 'telemetry')}
+                        >
+                          <Eye size={13} /> İncele &amp; Detay
+                        </button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -196,7 +213,7 @@ export default function CihazlarView() {
           </div>
 
           <div style={{ display: 'flex', justify: 'space-between', alignItems: 'center', fontSize: '12px', color: 'var(--text-muted)', marginTop: '10px' }}>
-            <span>Toplam {devicesList.length} cihaz kayıtlı</span>
+            <span>Toplam {devicesList.length} kayıtlı cihaz sıralanıyor</span>
             <div style={{ display: 'flex', gap: '4px' }}>
               <button className="btn btn-outline" style={{ padding: '3px 8px', fontSize: '11px' }}>«</button>
               <button className="btn btn-primary" style={{ padding: '3px 8px', fontSize: '11px' }}>1</button>
@@ -206,89 +223,15 @@ export default function CihazlarView() {
           </div>
         </div>
 
-        {/* Selected Device Inspector Panel */}
-        <div className="card col-span-5">
-          <div className="card-header">
-            <div className="card-title">Seçili Cihaz: {selectedDevice.name}</div>
-            <span className={`badge ${selectedDevice.status === 'Çevrimiçi' ? 'badge-success' : 'badge-warning'}`}>
-              ● {selectedDevice.status}
-            </span>
-          </div>
-
-          {/* 4 Live Telemetry Tiles with Pure Lucide Icons */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '10px', padding: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ color: 'var(--primary)' }}><Zap size={20} /></div>
-              <div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Aktif Güç</div>
-                <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-main)' }}>{selectedDevice.activePower}</div>
-              </div>
-            </div>
-
-            <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '10px', padding: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ color: 'var(--warning-text)' }}><Gauge size={20} /></div>
-              <div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Gerilim (Ortalama)</div>
-                <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-main)' }}>{selectedDevice.voltage}</div>
-              </div>
-            </div>
-
-            <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '10px', padding: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ color: 'var(--purple-text)' }}><Activity size={20} /></div>
-              <div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Akım (Ortalama)</div>
-                <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-main)' }}>{selectedDevice.current}</div>
-              </div>
-            </div>
-
-            <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '10px', padding: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ color: 'var(--success-text)' }}><RefreshCw size={20} /></div>
-              <div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Frekans</div>
-                <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-main)' }}>{selectedDevice.frequency}</div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '12px', marginTop: '6px' }}>
-            <div>
-              <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px' }}>Bağlantı Bilgileri</strong>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', color: 'var(--text-muted)' }}><span>Protokol:</span><span style={{ color: 'var(--text-main)' }}>{selectedDevice.protocol}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', color: 'var(--text-muted)' }}><span>IP Adresi:</span><span style={{ color: 'var(--text-main)' }}>{selectedDevice.address}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', color: 'var(--text-muted)' }}><span>Veri Kalitesi:</span><span style={{ color: 'var(--success-text)', fontWeight: 700 }}>%{selectedDevice.quality}</span></div>
-            </div>
-
-            <div>
-              <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '8px' }}>Cihaz Bilgileri</strong>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', color: 'var(--text-muted)' }}><span>Üretici:</span><span style={{ color: 'var(--text-main)' }}>{selectedDevice.vendor}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', color: 'var(--text-muted)' }}><span>Model:</span><span style={{ color: 'var(--text-main)' }}>{selectedDevice.model}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', color: 'var(--text-muted)' }}><span>Kalibrasyon:</span><span style={{ color: 'var(--text-main)' }}>{selectedDevice.calibDate}</span></div>
-            </div>
-          </div>
-
-          {/* Interactive Action Buttons */}
-          <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-            <button className="btn btn-outline" style={{ flex: 1, fontSize: '11px' }} onClick={() => setActiveModal('details')}>
-              <Eye size={14} /> Detaylar
-            </button>
-            <button className="btn btn-outline" style={{ flex: 1, fontSize: '11px' }} onClick={() => setActiveModal('charts')}>
-              <LineChartIcon size={14} /> Grafikler
-            </button>
-            <button className="btn btn-outline" style={{ flex: 1, fontSize: '11px' }} onClick={() => setActiveModal('settings')}>
-              <SettingsIcon size={14} /> Ayarlar
-            </button>
-          </div>
-        </div>
-
-        {/* System Event Logs Panel */}
+        {/* System Event Logs Panel (col-span-12) */}
         <div className="card col-span-12">
           <div className="card-header">
-            <div className="card-title"><Clock size={18} /> Sistem Logları</div>
+            <div className="card-title"><Clock size={18} /> Canlı Sistem &amp; Olay Logları</div>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <span className="badge badge-success">● Normal</span>
               <span className="badge badge-warning">● Uyarı</span>
               <span className="badge badge-danger">● Alarm</span>
-              <input type="text" className="copilot-input" placeholder="Tarih aralığı..." style={{ padding: '5px 10px', fontSize: '12px', width: '160px', marginLeft: '12px' }} />
+              <input type="text" className="copilot-input" placeholder="Olay ara..." style={{ padding: '5px 10px', fontSize: '12px', width: '160px', marginLeft: '12px' }} />
               <button className="btn btn-outline" style={{ padding: '5px 10px', fontSize: '12px' }}><Filter size={14} /></button>
             </div>
           </div>
@@ -299,7 +242,7 @@ export default function CihazlarView() {
                 <tr>
                   <th>Tarih / Saat</th>
                   <th>Modül</th>
-                  <th>Olay</th>
+                  <th>Olay Açıklaması</th>
                   <th>Seviye</th>
                   <th>Kullanıcı / Cihaz</th>
                   <th>Durum</th>
@@ -344,151 +287,248 @@ export default function CihazlarView() {
         </div>
       </div>
 
-      {/* ==================== MODAL 1: DETAYLAR MODAL ==================== */}
-      {activeModal === 'details' && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(6px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="card" style={{ width: '100%', maxWidth: '640px', background: 'var(--bg-sidebar)', border: '1px solid var(--border-card)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
-            <div className="card-header" style={{ borderBottom: '1px solid var(--border-card)', paddingBottom: '12px' }}>
-              <div className="card-title" style={{ fontSize: '16px' }}>
-                <Server size={18} /> {selectedDevice.name} - Teknik Detaylar &amp; Registerlar
-              </div>
-              <button className="btn-close-copilot" onClick={() => setActiveModal(null)}><X size={20} /></button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '12px', fontSize: '12px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
-                <div style={{ background: 'var(--bg-card-hover)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '10px' }}>Modbus Adresi</span>
-                  <strong style={{ display: 'block', color: 'var(--text-main)', fontSize: '14px' }}>{selectedDevice.address}</strong>
-                </div>
-                <div style={{ background: 'var(--bg-card-hover)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '10px' }}>Bağlantı Kalitesi</span>
-                  <strong style={{ display: 'block', color: 'var(--success-text)', fontSize: '14px' }}>%{selectedDevice.quality}</strong>
-                </div>
-                <div style={{ background: 'var(--bg-card-hover)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '10px' }}>Model &amp; Sürüm</span>
-                  <strong style={{ display: 'block', color: 'var(--text-main)', fontSize: '14px' }}>{selectedDevice.model} (v2.3)</strong>
-                </div>
-              </div>
-
-              <strong style={{ color: 'var(--text-main)', fontSize: '13px' }}>Canlı Modbus Register Okumaları</strong>
-              <div className="table-responsive">
-                <table className="custom-table" style={{ fontSize: '11px' }}>
-                  <thead>
-                    <tr>
-                      <th>Register (Hex)</th>
-                      <th>Parametre</th>
-                      <th>Değer</th>
-                      <th>Birim</th>
-                      <th>Tip</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="mono">0x3001 (40001)</td>
-                      <td>Aktif Güç (L1-L3 Total)</td>
-                      <td className="mono" style={{ fontWeight: 700, color: 'var(--primary)' }}>{selectedDevice.activePower}</td>
-                      <td>MW</td>
-                      <td>Float32</td>
-                    </tr>
-                    <tr>
-                      <td className="mono">0x3003 (40003)</td>
-                      <td>Gerilim L1-N</td>
-                      <td className="mono">{selectedDevice.voltage}</td>
-                      <td>kV</td>
-                      <td>Float32</td>
-                    </tr>
-                    <tr>
-                      <td className="mono">0x3005 (40005)</td>
-                      <td>Akım Ortalama</td>
-                      <td className="mono">{selectedDevice.current}</td>
-                      <td>A</td>
-                      <td>Float32</td>
-                    </tr>
-                    <tr>
-                      <td className="mono">0x3007 (40007)</td>
-                      <td>Şebeke Frekansı</td>
-                      <td className="mono">{selectedDevice.frequency}</td>
-                      <td>Hz</td>
-                      <td>Float32</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', paddingTop: '12px', borderTop: '1px solid var(--border-card)' }}>
-              <button className="btn btn-outline" onClick={() => setActiveModal(null)}>Kapat</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ==================== MODAL 2: GRAFİKLER MODAL ==================== */}
-      {activeModal === 'charts' && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(6px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="card" style={{ width: '100%', maxWidth: '720px', background: 'var(--bg-sidebar)', border: '1px solid var(--border-card)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
-            <div className="card-header" style={{ borderBottom: '1px solid var(--border-card)', paddingBottom: '12px' }}>
-              <div className="card-title" style={{ fontSize: '16px' }}>
-                <TrendingUp size={18} /> {selectedDevice.name} - Telemetri Trendi
-              </div>
-              <button className="btn-close-copilot" onClick={() => setActiveModal(null)}><X size={20} /></button>
-            </div>
-
-            <div style={{ height: '300px', width: '100%', marginTop: '16px' }}>
-              <Line data={chartData} options={chartOptions} />
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', paddingTop: '12px', borderTop: '1px solid var(--border-card)' }}>
-              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Son 24 saatlik canlı polling verisi.</span>
-              <button className="btn btn-outline" onClick={() => setActiveModal(null)}>Kapat</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ==================== MODAL 3: AYARLAR MODAL ==================== */}
-      {activeModal === 'settings' && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(6px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="card" style={{ width: '100%', maxWidth: '540px', background: 'var(--bg-sidebar)', border: '1px solid var(--border-card)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
-            <div className="card-header" style={{ borderBottom: '1px solid var(--border-card)', paddingBottom: '12px' }}>
-              <div className="card-title" style={{ fontSize: '16px' }}>
-                <Sliders size={18} /> {selectedDevice.name} - Konfigürasyon
-              </div>
-              <button className="btn-close-copilot" onClick={() => setActiveModal(null)}><X size={20} /></button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px', fontSize: '12px' }}>
-              <div>
-                <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>IP Adresi &amp; Port</label>
-                <input type="text" className="copilot-input" defaultValue={selectedDevice.address} style={{ width: '100%' }} />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div>
-                  <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Modbus Slave ID</label>
-                  <input type="text" className="copilot-input" defaultValue="1" style={{ width: '100%' }} />
+      {/* ==================== SEÇİLİ CİHAZ POP-UP DETAY MODAL ==================== */}
+      {selectedDevice && (
+        <div 
+          style={{ 
+            position: 'fixed', 
+            inset: 0, 
+            background: 'rgba(15, 23, 42, 0.55)', 
+            backdropFilter: 'blur(8px)', 
+            zIndex: 250, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            padding: '24px' 
+          }}
+          onClick={() => setSelectedDevice(null)}
+        >
+          <div 
+            className="card" 
+            style={{ 
+              width: '100%', 
+              maxWidth: '960px', 
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              background: isLight ? '#ffffff' : 'var(--bg-card)', 
+              border: '1px solid var(--border-card)', 
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              padding: '28px',
+              borderRadius: '20px'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="card-header" style={{ borderBottom: '1px solid var(--border-card)', paddingBottom: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'var(--primary-light)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Server size={22} />
                 </div>
                 <div>
-                  <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Okuma Sıklığı (sn)</label>
-                  <input type="text" className="copilot-input" defaultValue="5" style={{ width: '100%' }} />
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
+                    {selectedDevice.name}
+                  </h3>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                    Lokasyon: {selectedDevice.location} | Model: {selectedDevice.model} ({selectedDevice.vendor})
+                  </span>
                 </div>
               </div>
-
-              <div>
-                <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Akım Trafosu Oranı (CT Ratio)</label>
-                <input type="text" className="copilot-input" defaultValue="1000/5" style={{ width: '100%' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span className={`badge ${selectedDevice.status === 'Çevrimiçi' ? 'badge-success' : 'badge-warning'}`}>
+                  ● {selectedDevice.status}
+                </span>
+                <button className="btn-close-copilot" onClick={() => setSelectedDevice(null)}><X size={22} /></button>
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px', paddingTop: '12px', borderTop: '1px solid var(--border-card)' }}>
-              <button className="btn btn-outline" onClick={() => setActiveModal(null)}>İptal</button>
-              <button className="btn btn-primary" onClick={() => {
-                showNotification('Cihaz Konfigürasyonu', `${selectedDevice.name} konfigürasyonu başarıyla kaydedildi!`, 'success');
-                setActiveModal(null);
-              }}>
-                <Save size={14} /> Konfigürasyonu Kaydet
+            {/* Sub Navigation Tabs */}
+            <div style={{ display: 'flex', gap: '8px', margin: '16px 0', borderBottom: '1px solid var(--border-card)', paddingBottom: '10px' }}>
+              <button 
+                className={`btn ${modalTab === 'telemetry' ? 'btn-primary' : 'btn-outline'}`} 
+                style={{ padding: '6px 14px', fontSize: '12px' }}
+                onClick={() => setModalTab('telemetry')}
+              >
+                <Zap size={14} /> Canlı Telemetri &amp; Künye
               </button>
+              <button 
+                className={`btn ${modalTab === 'registers' ? 'btn-primary' : 'btn-outline'}`} 
+                style={{ padding: '6px 14px', fontSize: '12px' }}
+                onClick={() => setModalTab('registers')}
+              >
+                <Layers size={14} /> Modbus Registerları
+              </button>
+              <button 
+                className={`btn ${modalTab === 'charts' ? 'btn-primary' : 'btn-outline'}`} 
+                style={{ padding: '6px 14px', fontSize: '12px' }}
+                onClick={() => setModalTab('charts')}
+              >
+                <TrendingUp size={14} /> Trend Grafiği
+              </button>
+              <button 
+                className={`btn ${modalTab === 'settings' ? 'btn-primary' : 'btn-outline'}`} 
+                style={{ padding: '6px 14px', fontSize: '12px' }}
+                onClick={() => setModalTab('settings')}
+              >
+                <SlidersHorizontal size={14} /> Cihaz Ayarları
+              </button>
+            </div>
+
+            {/* TAB 1: TELEMETRY & SPECS */}
+            {modalTab === 'telemetry' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* 4 Live Telemetry Tiles */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+                  <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '12px', padding: '14px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ color: 'var(--primary)' }}><Zap size={24} /></div>
+                    <div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Aktif Güç</div>
+                      <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', fontFamily: 'JetBrains Mono' }}>{selectedDevice.activePower}</div>
+                    </div>
+                  </div>
+
+                  <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '12px', padding: '14px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ color: 'var(--warning-text)' }}><Gauge size={24} /></div>
+                    <div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Gerilim (Ort)</div>
+                      <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', fontFamily: 'JetBrains Mono' }}>{selectedDevice.voltage}</div>
+                    </div>
+                  </div>
+
+                  <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '12px', padding: '14px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ color: 'var(--purple-text)' }}><Activity size={24} /></div>
+                    <div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Akım (Ort)</div>
+                      <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', fontFamily: 'JetBrains Mono' }}>{selectedDevice.current}</div>
+                    </div>
+                  </div>
+
+                  <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '12px', padding: '14px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ color: 'var(--success-text)' }}><RefreshCw size={24} /></div>
+                    <div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Şebeke Frekansı</div>
+                      <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', fontFamily: 'JetBrains Mono' }}>{selectedDevice.frequency}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Connection & Vendor Info 2-Column */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '13px' }}>
+                  <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '12px', padding: '16px' }}>
+                    <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '10px', fontSize: '14px' }}>📡 Haberleşme &amp; Bağlantı Parametreleri</strong>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', color: 'var(--text-muted)' }}><span>İletişim Protokolü:</span><span className="mono" style={{ color: 'var(--text-main)', fontWeight: 700 }}>{selectedDevice.protocol}</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', color: 'var(--text-muted)' }}><span>IP &amp; Modbus Adresi:</span><span className="mono" style={{ color: 'var(--text-main)', fontWeight: 700 }}>{selectedDevice.address}</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', color: 'var(--text-muted)' }}><span>Sinyal / Veri Kalitesi:</span><span className="mono" style={{ color: 'var(--success-text)', fontWeight: 800 }}>%{selectedDevice.quality} (Mükemmel)</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)' }}><span>Polling Sıklığı:</span><span className="mono" style={{ color: 'var(--text-main)' }}>5000 ms</span></div>
+                  </div>
+
+                  <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '12px', padding: '16px' }}>
+                    <strong style={{ color: 'var(--text-main)', display: 'block', marginBottom: '10px', fontSize: '14px' }}>⚙️ Donanım &amp; Kalibrasyon Künyesi</strong>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', color: 'var(--text-muted)' }}><span>Cihaz Üreticisi:</span><span style={{ color: 'var(--text-main)', fontWeight: 700 }}>{selectedDevice.vendor}</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', color: 'var(--text-muted)' }}><span>Model Kodu:</span><span style={{ color: 'var(--text-main)', fontWeight: 700 }}>{selectedDevice.model}</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', color: 'var(--text-muted)' }}><span>Son Kalibrasyon:</span><span style={{ color: 'var(--text-main)', fontWeight: 700 }}>{selectedDevice.calibDate}</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)' }}><span>Gelecek Bakım Periyodu:</span><span style={{ color: 'var(--primary)', fontWeight: 700 }}>02.03.2026 (360 gün var)</span></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: MODBUS REGISTERS */}
+            {modalTab === 'registers' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <strong style={{ color: 'var(--text-main)', fontSize: '14px' }}>Canlı Modbus Register Tablosu</strong>
+                <div className="table-responsive">
+                  <table className="custom-table" style={{ fontSize: '12px' }}>
+                    <thead>
+                      <tr>
+                        <th>Register (Hex / Dec)</th>
+                        <th>Parametre Adı</th>
+                        <th>Anlık Değer</th>
+                        <th>Birim</th>
+                        <th>Veri Tipi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="mono">0x3001 (40001)</td>
+                        <td>Aktif Güç (L1-L3 Toplam)</td>
+                        <td className="mono" style={{ fontWeight: 800, color: 'var(--primary)' }}>{selectedDevice.activePower}</td>
+                        <td>MW</td>
+                        <td>Float32</td>
+                      </tr>
+                      <tr>
+                        <td className="mono">0x3003 (40003)</td>
+                        <td>Gerilim L1-N</td>
+                        <td className="mono" style={{ fontWeight: 700 }}>{selectedDevice.voltage}</td>
+                        <td>kV</td>
+                        <td>Float32</td>
+                      </tr>
+                      <tr>
+                        <td className="mono">0x3005 (40005)</td>
+                        <td>Akım (Ortalama)</td>
+                        <td className="mono" style={{ fontWeight: 700 }}>{selectedDevice.current}</td>
+                        <td>A</td>
+                        <td>Float32</td>
+                      </tr>
+                      <tr>
+                        <td className="mono">0x3007 (40007)</td>
+                        <td>Şebeke Frekansı</td>
+                        <td className="mono" style={{ fontWeight: 700 }}>{selectedDevice.frequency}</td>
+                        <td>Hz</td>
+                        <td>Float32</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: CHARTS */}
+            {modalTab === 'charts' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <strong style={{ color: 'var(--text-main)', fontSize: '14px' }}>Son 24 Saatlik Çekiş Trendi</strong>
+                <div className="chart-card-animated" style={{ height: '300px', width: '100%' }}>
+                  <Line key={`cihazlar-${selectedDevice?.code}-${isLight}`} data={chartData} options={chartOptions} />
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: SETTINGS */}
+            {modalTab === 'settings' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '12px' }}>
+                <div>
+                  <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>IP Adresi &amp; Port</label>
+                  <input type="text" className="copilot-input" defaultValue={selectedDevice.address} style={{ width: '100%' }} />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Modbus Slave ID</label>
+                    <input type="text" className="copilot-input" defaultValue="1" style={{ width: '100%' }} />
+                  </div>
+                  <div>
+                    <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Okuma Sıklığı (sn)</label>
+                    <input type="text" className="copilot-input" defaultValue="5" style={{ width: '100%' }} />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Akım Trafosu Oranı (CT Ratio)</label>
+                  <input type="text" className="copilot-input" defaultValue="1000/5" style={{ width: '100%' }} />
+                </div>
+              </div>
+            )}
+
+            {/* Modal Footer Actions */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px', paddingTop: '14px', borderTop: '1px solid var(--border-card)' }}>
+              <button className="btn btn-outline" onClick={() => setSelectedDevice(null)}>Kapat</button>
+              {modalTab === 'settings' && (
+                <button className="btn btn-primary" onClick={() => {
+                  showNotification('Cihaz Konfigürasyonu', `${selectedDevice.name} konfigürasyonu kaydedildi!`, 'success');
+                  setSelectedDevice(null);
+                }}>
+                  <Save size={14} /> Konfigürasyonu Kaydet
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -46,12 +46,14 @@ export default function DashboardView() {
   const [trendMetric, setTrendMetric] = useState('energy'); // 'energy' or 'cost'
   const [distributionTab, setDistributionTab] = useState('type'); // 'type' or 'lines'
 
+  const [timeRange, setTimeRange] = useState('7d'); // '7d' or '30d'
+
   const isLight = theme === 'light';
   const textColor = isLight ? '#475569' : (theme === 'yellow-black' ? '#d4d4d8' : '#94a3b8');
   const gridColor = isLight ? '#e2e8f0' : 'rgba(255, 255, 255, 0.05)';
 
-  // Main Hero Trend Chart Data
-  const energyTrendData = {
+  // Main Hero Trend Chart Data (7 Days)
+  const energyTrendData7d = {
     labels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
     datasets: [
       {
@@ -84,11 +86,45 @@ export default function DashboardView() {
     ]
   };
 
-  const costTrendData = {
+  // Main Hero Trend Chart Data (30 Days)
+  const energyTrendData30d = {
+    labels: ['22 Tem', '24 Tem', '26 Tem', '28 Tem', '30 Tem', '1 Ağu', '3 Ağu', '5 Ağu', '7 Ağu', '9 Ağu', '11 Ağu', '13 Ağu', '15 Ağu', '17 Ağu', '19 Ağu'],
+    datasets: [
+      {
+        label: 'Elektrik Yoğunluğu (kWh/ton)',
+        data: [385.1, 379.4, 372.0, 368.5, 362.1, 358.4, 361.0, 354.2, 349.8, 352.1, 346.0, 342.6, 339.8, 341.2, 342.6],
+        borderColor: '#2563eb',
+        backgroundColor: (context) => {
+          const ctx = context.chart.ctx;
+          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+          gradient.addColorStop(0, 'rgba(37, 99, 235, 0.25)');
+          gradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
+          return gradient;
+        },
+        fill: true,
+        tension: 0.4,
+        borderWidth: 3,
+        pointBackgroundColor: '#2563eb',
+        pointRadius: 3,
+        pointHoverRadius: 6
+      },
+      {
+        label: 'Aylık Hedef (350 kWh/ton)',
+        data: Array(15).fill(350),
+        borderColor: isLight ? '#cbd5e1' : 'rgba(255, 255, 255, 0.2)',
+        borderDash: [6, 6],
+        fill: false,
+        pointRadius: 0,
+        borderWidth: 2
+      }
+    ]
+  };
+
+  const costTrendData7d = {
     labels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
     datasets: [
       {
-        label: 'BirimÜrün Maliyeti (TL/ton)',
+        label: 'Birim Ürün Maliyeti (TL/ton)',
         data: [208.5, 201.3, 195.4, 186.7, 184.2, 185.0, 186.7],
         borderColor: '#7c3aed',
         backgroundColor: (context) => {
@@ -108,9 +144,37 @@ export default function DashboardView() {
     ]
   };
 
+  const costTrendData30d = {
+    labels: ['22 Tem', '24 Tem', '26 Tem', '28 Tem', '30 Tem', '1 Ağu', '3 Ağu', '5 Ağu', '7 Ağu', '9 Ağu', '11 Ağu', '13 Ağu', '15 Ağu', '17 Ağu', '19 Ağu'],
+    datasets: [
+      {
+        label: 'Birim Ürün Maliyeti (TL/ton)',
+        data: [224.0, 219.5, 215.2, 211.8, 208.5, 205.1, 207.3, 201.3, 197.8, 195.4, 189.6, 186.7, 184.2, 185.0, 186.7],
+        borderColor: '#7c3aed',
+        backgroundColor: (context) => {
+          const ctx = context.chart.ctx;
+          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+          gradient.addColorStop(0, 'rgba(124, 58, 237, 0.25)');
+          gradient.addColorStop(1, 'rgba(124, 58, 237, 0.0)');
+          return gradient;
+        },
+        fill: true,
+        tension: 0.4,
+        borderWidth: 3,
+        pointBackgroundColor: '#7c3aed',
+        pointRadius: 3,
+        pointHoverRadius: 6
+      }
+    ]
+  };
+
   const trendChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 1400,
+      easing: 'easeOutQuart'
+    },
     plugins: {
       legend: {
         position: 'top',
@@ -154,6 +218,32 @@ export default function DashboardView() {
         borderRadius: 8
       }
     ]
+  };
+
+  const doughnutChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: {
+      animateScale: true,
+      animateRotate: true,
+      duration: 1400,
+      easing: 'easeOutQuart'
+    },
+    plugins: { legend: { display: false } }
+  };
+
+  const lineDensityChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: {
+      duration: 1400,
+      easing: 'easeOutQuart'
+    },
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: textColor }, grid: { display: false } },
+      y: { ticks: { color: textColor }, grid: { color: gridColor } }
+    }
   };
 
   return (
@@ -284,15 +374,32 @@ export default function DashboardView() {
 
             {/* Time Filter Pills */}
             <div style={{ display: 'flex', gap: '4px' }}>
-              <button className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '11px' }}>Son 7 Gün</button>
-              <button className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '11px' }}>Son 30 Gün</button>
+              <button 
+                className={`btn ${timeRange === '7d' ? 'btn-primary' : 'btn-outline'}`} 
+                style={{ padding: '6px 12px', fontSize: '11px' }}
+                onClick={() => setTimeRange('7d')}
+              >
+                Son 7 Gün
+              </button>
+              <button 
+                className={`btn ${timeRange === '30d' ? 'btn-primary' : 'btn-outline'}`} 
+                style={{ padding: '6px 12px', fontSize: '11px' }}
+                onClick={() => setTimeRange('30d')}
+              >
+                Son 30 Gün
+              </button>
             </div>
           </div>
         </div>
 
         <div className="chart-container" style={{ height: '320px' }}>
           <Line 
-            data={trendMetric === 'energy' ? energyTrendData : costTrendData} 
+            key={`trend-${trendMetric}-${timeRange}-${isLight}`}
+            data={
+              trendMetric === 'energy' 
+                ? (timeRange === '7d' ? energyTrendData7d : energyTrendData30d)
+                : (timeRange === '7d' ? costTrendData7d : costTrendData30d)
+            } 
             options={trendChartOptions} 
           />
         </div>
@@ -328,8 +435,9 @@ export default function DashboardView() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', height: '240px', flexWrap: 'wrap' }}>
               <div style={{ width: '200px', height: '200px' }}>
                 <Doughnut 
+                  key={`doughnut-${distributionTab}-${isLight}`}
                   data={energyTypeData} 
-                  options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} 
+                  options={doughnutChartOptions} 
                 />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13px' }}>
@@ -353,16 +461,9 @@ export default function DashboardView() {
           ) : (
             <div style={{ height: '240px' }}>
               <Bar 
+                key={`bar-${distributionTab}-${isLight}`}
                 data={lineDensityData} 
-                options={{ 
-                  responsive: true, 
-                  maintainAspectRatio: false, 
-                  plugins: { legend: { display: false } },
-                  scales: {
-                    x: { ticks: { color: textColor }, grid: { display: false } },
-                    y: { ticks: { color: textColor }, grid: { color: gridColor } }
-                  }
-                }} 
+                options={lineDensityChartOptions} 
               />
             </div>
           )}

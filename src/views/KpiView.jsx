@@ -82,6 +82,10 @@ export default function KpiView() {
   const densityTrendOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 1400,
+      easing: 'easeOutQuart'
+    },
     plugins: {
       legend: {
         position: 'bottom',
@@ -110,6 +114,10 @@ export default function KpiView() {
   const productBarOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 1400,
+      easing: 'easeOutQuart'
+    },
     plugins: { legend: { display: false } },
     scales: {
       x: { ticks: { color: textColor, font: { family: 'Plus Jakarta Sans', size: 11 } }, grid: { display: false } },
@@ -144,6 +152,10 @@ export default function KpiView() {
   const scatterOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 1400,
+      easing: 'easeOutQuart'
+    },
     plugins: {
       legend: { display: false }
     },
@@ -391,7 +403,7 @@ export default function KpiView() {
                 </div>
               </div>
               <div className="chart-container" style={{ height: '240px' }}>
-                <Line data={densityTrendData} options={densityTrendOptions} />
+                <Line key={`kpi-density-${isLight}`} data={densityTrendData} options={densityTrendOptions} />
               </div>
             </div>
 
@@ -403,7 +415,7 @@ export default function KpiView() {
                 </div>
               </div>
               <div className="chart-container" style={{ height: '240px' }}>
-                <Bar data={productBarData} options={productBarOptions} />
+                <Bar key={`kpi-bar-${isLight}`} data={productBarData} options={productBarOptions} />
               </div>
             </div>
 
@@ -425,7 +437,7 @@ export default function KpiView() {
                 </span>
               </div>
               <div className="chart-container" style={{ height: '240px' }}>
-                <Scatter data={scatterData} options={scatterOptions} />
+                <Scatter key={`kpi-scatter-${isLight}`} data={scatterData} options={scatterOptions} />
               </div>
             </div>
 

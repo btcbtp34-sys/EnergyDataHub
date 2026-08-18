@@ -117,6 +117,10 @@ export default function SapView() {
   const volumeChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 1400,
+      easing: 'easeOutQuart'
+    },
     plugins: {
       legend: {
         position: 'top',
@@ -319,8 +323,8 @@ export default function SapView() {
             </div>
           </div>
 
-          <div style={{ height: '300px', width: '100%', marginTop: '6px' }}>
-            <Bar data={volumeChartData} options={volumeChartOptions} />
+          <div className="chart-card-animated" style={{ height: '300px', width: '100%', marginTop: '6px' }}>
+            <Bar key={`sap-volume-${isLight}`} data={volumeChartData} options={volumeChartOptions} />
           </div>
         </div>
 

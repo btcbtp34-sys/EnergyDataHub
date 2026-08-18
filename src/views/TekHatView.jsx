@@ -95,6 +95,10 @@ export default function TekHatView() {
   const balanceTrendOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 1400,
+      easing: 'easeOutQuart'
+    },
     plugins: {
       legend: {
         position: 'bottom',
@@ -577,7 +581,7 @@ export default function TekHatView() {
                 </div>
               </div>
               <div className="chart-container" style={{ height: '240px' }}>
-                <Line data={balanceTrendData} options={balanceTrendOptions} />
+                <Line key={`tekhat-balance-${isLight}`} data={balanceTrendData} options={balanceTrendOptions} />
               </div>
             </div>
 
@@ -618,21 +622,19 @@ export default function TekHatView() {
                   <div className="metric-icon blue" style={{ width: '36px', height: '36px' }}><Wifi size={18} /></div>
                   <div>
                     <strong style={{ fontSize: '13px', color: 'var(--text-main)', display: 'block' }}>4. Haberleşme Problemi</strong>
-                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Veri kaybı veya gecikmeleri geçici dengesizliklere sebep olabilir.</span>
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Veri kaybı veya gecikmeleri geçici sapmalar yaratabilir.</span>
                   </div>
                 </div>
               </div>
             </div>
-
           </div>
         </div>
-
       </div>
 
       {/* INTERACTIVE NODE DETAILS MODAL */}
       {selectedNode && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.65)', backdropFilter: 'blur(6px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="card" style={{ width: '100%', maxWidth: '500px', background: 'var(--bg-sidebar)', border: '1px solid var(--border-card)', boxShadow: '0 25px 60px rgba(0,0,0,0.5)' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.55)', backdropFilter: 'blur(8px)', zIndex: 250, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }} onClick={() => setSelectedNode(null)}>
+          <div className="card" style={{ width: '100%', maxWidth: '520px', background: isLight ? '#ffffff' : 'var(--bg-card)', border: '1px solid var(--border-card)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', borderRadius: '20px', padding: '24px' }} onClick={(e) => e.stopPropagation()}>
             <div className="card-header" style={{ borderBottom: '1px solid var(--border-card)', paddingBottom: '14px' }}>
               <div className="card-title" style={{ fontSize: '16px' }}>
                 <Network size={20} color="var(--primary)" /> {selectedNode.name} Sayaç Detayı
@@ -653,14 +655,14 @@ export default function TekHatView() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '12px', padding: '14px' }}>
+                <div style={{ background: isLight ? '#f8fafc' : 'var(--bg-input)', border: '1px solid var(--border-card)', borderRadius: '12px', padding: '14px' }}>
                   <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Anlık Aktif Güç</div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', marginTop: '4px' }}>{selectedNode.power}</div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', marginTop: '4px', fontFamily: 'JetBrains Mono' }}>{selectedNode.power}</div>
                 </div>
 
-                <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '12px', padding: '14px' }}>
+                <div style={{ background: isLight ? '#f8fafc' : 'var(--bg-input)', border: '1px solid var(--border-card)', borderRadius: '12px', padding: '14px' }}>
                   <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Toplam Enerji Tüketimi</div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', marginTop: '4px' }}>{selectedNode.energy}</div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-main)', marginTop: '4px', fontFamily: 'JetBrains Mono' }}>{selectedNode.energy}</div>
                 </div>
               </div>
             </div>

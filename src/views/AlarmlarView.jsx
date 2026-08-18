@@ -496,8 +496,8 @@ export default function AlarmlarView() {
 
       {/* NEW RULE CREATION POP-UP MODAL */}
       {isAddingRule && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(8px)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="card" style={{ width: '100%', maxWidth: '560px', background: 'var(--bg-sidebar)', border: '1px solid var(--border-card)', boxShadow: '0 30px 80px rgba(0,0,0,0.6)' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.55)', backdropFilter: 'blur(8px)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+          <div className="card" style={{ width: '100%', maxWidth: '560px', background: isLight ? '#ffffff' : 'var(--bg-card)', border: '1px solid var(--border-card)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', borderRadius: '20px' }}>
             <div className="card-header" style={{ borderBottom: '1px solid var(--border-card)', paddingBottom: '14px' }}>
               <div className="card-title" style={{ fontSize: '17px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Plus size={22} color="var(--primary)" />
@@ -595,11 +595,11 @@ export default function AlarmlarView() {
 
       {/* WIDE HORIZONTAL 2-COLUMN POP-UP "SEÇİLİ KURAL DETAYLARI" MODAL */}
       {inspectingRule && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(8px)', zIndex: 250, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div className="card" style={{ width: '100%', maxWidth: '1150px', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-sidebar)', border: '1px solid var(--border-card)', boxShadow: '0 30px 80px rgba(0,0,0,0.6)' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.55)', backdropFilter: 'blur(8px)', zIndex: 250, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+          <div className="card" style={{ width: '100%', maxWidth: '1150px', maxHeight: '90vh', overflowY: 'auto', background: isLight ? '#ffffff' : 'var(--bg-card)', border: '1px solid var(--border-card)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', borderRadius: '20px' }}>
             
             {/* Modal Header */}
-            <div className="card-header" style={{ borderBottom: '1px solid var(--border-card)', paddingBottom: '14px', position: 'sticky', top: 0, background: 'var(--bg-sidebar)', zIndex: 10 }}>
+            <div className="card-header" style={{ borderBottom: '1px solid var(--border-card)', paddingBottom: '14px', position: 'sticky', top: 0, background: isLight ? '#ffffff' : 'var(--bg-card)', zIndex: 10 }}>
               <div className="card-title" style={{ fontSize: '17px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <ShieldAlert size={22} color="var(--primary)" />
                 <span>Seçili Kural Detayları: <strong>{inspectingRule.name}</strong></span>
@@ -629,7 +629,7 @@ export default function AlarmlarView() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 
                 {/* 1. Eşik Ayarları */}
-                <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '14px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ background: isLight ? '#ffffff' : 'var(--bg-input)', border: '1px solid var(--border-card)', borderRadius: '14px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-card)', paddingBottom: '6px' }}>
                     <strong style={{ fontSize: '13.5px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Activity size={16} color="var(--primary)" /> 1. Eşik Ayarları
@@ -640,19 +640,19 @@ export default function AlarmlarView() {
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '12px' }}>
-                    <div style={{ background: 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
+                    <div style={{ background: isLight ? '#f8fafc' : 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
                       <span style={{ color: 'var(--text-muted)', display: 'block' }}>İzlenen Parametre:</span>
                       <strong style={{ color: 'var(--text-main)' }}>{inspectingRule.param}</strong>
                     </div>
-                    <div style={{ background: 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
+                    <div style={{ background: isLight ? '#f8fafc' : 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
                       <span style={{ color: 'var(--text-muted)', display: 'block' }}>Mantıksal Koşul:</span>
                       <strong style={{ color: 'var(--text-main)' }}>{inspectingRule.condition}</strong>
                     </div>
-                    <div style={{ background: 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
+                    <div style={{ background: isLight ? '#f8fafc' : 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
                       <span style={{ color: 'var(--text-muted)', display: 'block' }}>Eşik Değeri:</span>
                       <strong className="mono" style={{ color: 'var(--danger-text)', fontSize: '14px' }}>{inspectingRule.thresholdVal}</strong>
                     </div>
-                    <div style={{ background: 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
+                    <div style={{ background: isLight ? '#f8fafc' : 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
                       <span style={{ color: 'var(--text-muted)', display: 'block' }}>Gecikme Süresi:</span>
                       <strong style={{ color: 'var(--text-main)' }}>{inspectingRule.delay}</strong>
                     </div>
@@ -660,7 +660,7 @@ export default function AlarmlarView() {
                 </div>
 
                 {/* 2. Bildirim Kanalları */}
-                <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '14px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ background: isLight ? '#ffffff' : 'var(--bg-input)', border: '1px solid var(--border-card)', borderRadius: '14px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-card)', paddingBottom: '6px' }}>
                     <strong style={{ fontSize: '13.5px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Send size={16} color="var(--primary)" /> 2. Bildirim Kanalları
@@ -684,7 +684,7 @@ export default function AlarmlarView() {
                 </div>
 
                 {/* 3. Sessiz Saatler */}
-                <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '14px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ background: isLight ? '#ffffff' : 'var(--bg-input)', border: '1px solid var(--border-card)', borderRadius: '14px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <strong style={{ fontSize: '13.5px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Moon size={16} color="var(--primary)" /> 3. Sessiz Saatler (Kısıt)
@@ -704,7 +704,7 @@ export default function AlarmlarView() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 
                 {/* 4. Sorumlu Kullanıcılar */}
-                <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '14px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ background: isLight ? '#ffffff' : 'var(--bg-input)', border: '1px solid var(--border-card)', borderRadius: '14px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-card)', paddingBottom: '6px' }}>
                     <strong style={{ fontSize: '13.5px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <UserCheck size={16} color="var(--primary)" /> 4. Sorumlu Kullanıcılar
@@ -715,15 +715,15 @@ export default function AlarmlarView() {
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
-                    <div style={{ background: 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
+                    <div style={{ background: isLight ? '#f8fafc' : 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
                       <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '11px' }}>Birincil Sorumlu:</span>
                       <strong style={{ color: 'var(--text-main)' }}>{inspectingRule.primaryUser}</strong>
                     </div>
-                    <div style={{ background: 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
+                    <div style={{ background: isLight ? '#f8fafc' : 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
                       <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '11px' }}>İkincil Sorumlu:</span>
                       <strong style={{ color: 'var(--text-main)' }}>{inspectingRule.secondaryUser}</strong>
                     </div>
-                    <div style={{ background: 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
+                    <div style={{ background: isLight ? '#f8fafc' : 'var(--bg-card)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-card)' }}>
                       <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '11px' }}>Bilgilendirilen:</span>
                       <strong style={{ color: 'var(--text-main)' }}>{inspectingRule.infoUser}</strong>
                     </div>
@@ -731,7 +731,7 @@ export default function AlarmlarView() {
                 </div>
 
                 {/* 5. Yükseltme (Eskalasyon) Adımları */}
-                <div style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border-card)', borderRadius: '14px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ background: isLight ? '#ffffff' : 'var(--bg-input)', border: '1px solid var(--border-card)', borderRadius: '14px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-card)', paddingBottom: '6px' }}>
                     <strong style={{ fontSize: '13.5px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <AlertTriangle size={16} color="var(--warning-text)" /> 5. Yükseltme (Eskalasyon) Adımları

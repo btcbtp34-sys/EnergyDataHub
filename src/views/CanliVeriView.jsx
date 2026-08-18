@@ -103,6 +103,10 @@ export default function CanliVeriView() {
   const miniChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 1400,
+      easing: 'easeOutQuart'
+    },
     plugins: { legend: { display: false } },
     scales: {
       x: { ticks: { color: textColor, font: { family: 'Plus Jakarta Sans', size: 11 } }, grid: { display: false } },
@@ -749,7 +753,7 @@ export default function CanliVeriView() {
                 <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--primary)' }}>1.18 MW</span>
               </div>
               <div className="chart-container" style={{ height: '160px' }}>
-                <Line data={liveAgData} options={miniChartOptions} />
+                <Line key={`live-ag-${isLight}`} data={liveAgData} options={miniChartOptions} />
               </div>
             </div>
 
@@ -762,7 +766,7 @@ export default function CanliVeriView() {
                 <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--warning-text)' }}>2,274 Sm³</span>
               </div>
               <div className="chart-container" style={{ height: '160px' }}>
-                <Line data={liveGasData} options={miniChartOptions} />
+                <Line key={`live-gas-${isLight}`} data={liveGasData} options={miniChartOptions} />
               </div>
             </div>
 
@@ -775,7 +779,7 @@ export default function CanliVeriView() {
                 <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--info-text)' }}>329.8 m³</span>
               </div>
               <div className="chart-container" style={{ height: '160px' }}>
-                <Line data={liveWaterData} options={miniChartOptions} />
+                <Line key={`live-water-${isLight}`} data={liveWaterData} options={miniChartOptions} />
               </div>
             </div>
 

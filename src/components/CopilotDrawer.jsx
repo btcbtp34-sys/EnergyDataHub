@@ -9,11 +9,23 @@ import {
   Wind, 
   Banknote, 
   RefreshCw, 
-  Zap 
+  Zap,
+  CheckCircle2,
+  AlertTriangle,
+  FileText,
+  Mail
 } from 'lucide-react';
 
 export default function CopilotDrawer() {
-  const { isCopilotOpen, setIsCopilotOpen, copilotInitialPrompt, setCopilotInitialPrompt } = useTheme();
+  const { 
+    isCopilotOpen, 
+    setIsCopilotOpen, 
+    copilotInitialPrompt, 
+    setCopilotInitialPrompt,
+    copilotProposal,
+    setCopilotProposal 
+  } = useTheme();
+
   const [messages, setMessages] = useState([
     {
       sender: 'assistant',
@@ -38,6 +50,72 @@ export default function CopilotDrawer() {
       setCopilotInitialPrompt('');
     }
   }, [copilotInitialPrompt, isCopilotOpen]);
+
+  useEffect(() => {
+    if (copilotProposal && isCopilotOpen) {
+      handleProposalReceived(copilotProposal);
+      setCopilotProposal(null);
+    }
+  }, [copilotProposal, isCopilotOpen]);
+
+  const handleProposalReceived = (proposal) => {
+    const proposalMsg = {
+      id: `prop-${Date.now()}`,
+      sender: 'assistant',
+      isProposal: true,
+      proposalData: proposal,
+      status: 'pending' // 'pending' | 'executing' | 'completed'
+    };
+
+    setMessages((prev) => [...prev, proposalMsg]);
+  };
+
+  const handleExecuteAction = (msgId, actionType, actionLabel) => {
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === msgId ? { ...msg, status: 'completed', executedAction: actionLabel } : msg
+      )
+    );
+
+    // Append user confirmation
+    setMessages((prev) => [
+      ...prev,
+      { sender: 'user', text: `✅ Onaylıyorum: ${actionLabel}` }
+    ]);
+
+    setIsTyping(true);
+
+    setTimeout(() => {
+      setIsTyping(false);
+
+      if (actionType === 'cancel') {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: 'assistant',
+            html: `<div style="font-weight:700; color:var(--text-muted); margin-bottom:4px;">❌ Aksiyon İptal Edildi</div>Aksiyon talebi kullanıcı tarafından iptal edildi. Anomali izlemeye devam ediliyor.`
+          }
+        ]);
+        return;
+      }
+
+      const sapWoId = `WO-2026-${Math.floor(8000 + Math.random() * 1000)}`;
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: 'assistant',
+          html: `<div style="font-weight:700; color:var(--success-text); margin-bottom:6px;">✅ Aksiyon Planı Başarıyla İşleme Alındı!</div>
+          <div style="background:var(--bg-card-hover); border-left:3px solid var(--success-text); padding:10px 12px; border-radius:8px; font-size:12px; margin-bottom:8px;">
+            • <strong>SAP PM İş Emri No:</strong> <span class="mono" style="color:var(--primary); font-weight:800;">${sapWoId}</span><br>
+            • <strong>Entegrasyon Modülü:</strong> SAP S/4HANA PM (Plant Maintenance)<br>
+            • <strong>Atanan Sorumlu:</strong> Saha Bakım Kıdemli Teknisyeni (Ahmet Yılmaz)<br>
+            • <strong>Bildirimler:</strong> SMS ve E-Posta ile teknik ekibe eskalasyon yapıldı.
+          </div>
+          <em>Anomali durumu "Çözüm Sürecinde (SAP İş Emri Açıldı)" olarak güncellendi.</em>`
+        }
+      ]);
+    }, 800);
+  };
 
   const generateAIResponse = (query) => {
     const q = query.toLowerCase();
@@ -126,7 +204,65 @@ export default function CopilotDrawer() {
 
       <div className="copilot-body">
         {messages.map((msg, index) => (
-          msg.html ? (
+          msg.isProposal ? (
+            <div key={msg.id || index} className="chat-bubble assistant" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-card)', padding: '14px', borderRadius: '14px', width: '100%', maxWidth: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: 'var(--primary)', fontWeight: 700, fontSize: '13px' }}>
+                <Sparkles size={16} /> 🤖 AI Önerilen Aksiyon Planı
+              </div>
+
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-main)', marginBottom: '4px' }}>
+                {msg.proposalData.title || 'Anomali Çözüm Aksiyon Önerisi'}
+              </div>
+
+              {msg.proposalData.location && (
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '6px' }}>
+                  Lokasyon: {msg.proposalData.location}
+                </div>
+              )}
+
+              {msg.proposalData.impact && (
+                <div style={{ background: 'var(--danger-bg)', borderLeft: '3px solid var(--danger)', padding: '6px 10px', borderRadius: '6px', fontSize: '11px', color: 'var(--danger-text)', marginBottom: '8px' }}>
+                  <strong>Finansal Etki:</strong> {msg.proposalData.impact}
+                </div>
+              )}
+
+              <div style={{ fontSize: '12px', color: 'var(--text-main)', marginBottom: '10px' }}>
+                <strong>Önerilen Aksiyon Adımları:</strong>
+                <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
+                  <li>SAP S/4HANA PM modülünde Bakım İş Emri kaydı açılması</li>
+                  <li>Saha Kıdemli Teknisyenine SMS/E-posta ile eskalasyon yapılması</li>
+                </ul>
+              </div>
+
+              <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '8px' }}>
+                İşlemi onaylamak ister misiniz?
+              </div>
+
+              {msg.status === 'pending' ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <button 
+                    className="btn btn-primary" 
+                    style={{ fontSize: '11px', padding: '8px 12px', width: '100%', justifyContent: 'center' }}
+                    onClick={() => handleExecuteAction(msg.id, 'sap', 'SAP S/4HANA İş Emri Oluştur & Teknisyene Bildir')}
+                  >
+                    <FileText size={13} /> ✅ SAP S/4HANA İş Emri Aç & Teknisyene Bildir
+                  </button>
+
+                  <button 
+                    className="btn btn-outline" 
+                    style={{ fontSize: '11px', padding: '6px 12px', width: '100%', justifyContent: 'center' }}
+                    onClick={() => handleExecuteAction(msg.id, 'cancel', 'İptal Et')}
+                  >
+                    <X size={13} /> ❌ Talebi İptal Et
+                  </button>
+                </div>
+              ) : (
+                <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--success-text)', background: 'var(--success-bg)', padding: '6px 10px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <CheckCircle2 size={14} /> Karar Verildi: {msg.executedAction}
+                </div>
+              )}
+            </div>
+          ) : msg.html ? (
             <div
               key={index}
               className={`chat-bubble ${msg.sender}`}

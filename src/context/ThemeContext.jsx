@@ -26,6 +26,7 @@ export function ThemeProvider({ children }) {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const [copilotInitialPrompt, setCopilotInitialPrompt] = useState('');
+  const [copilotProposal, setCopilotProposal] = useState(null);
   const [notificationModal, setNotificationModal] = useState(null);
 
   useEffect(() => {
@@ -39,6 +40,11 @@ export function ThemeProvider({ children }) {
 
   const openCopilotWithPrompt = (promptText) => {
     setCopilotInitialPrompt(promptText);
+    setIsCopilotOpen(true);
+  };
+
+  const openCopilotWithProposal = (proposalObj) => {
+    setCopilotProposal({ ...proposalObj, timestamp: Date.now() });
     setIsCopilotOpen(true);
   };
 
@@ -63,6 +69,9 @@ export function ThemeProvider({ children }) {
       copilotInitialPrompt,
       setCopilotInitialPrompt,
       openCopilotWithPrompt,
+      copilotProposal,
+      setCopilotProposal,
+      openCopilotWithProposal,
       showNotification,
       currentPageTitle: pageTitles[activeView] || 'Executive Dashboard'
     }}>
