@@ -17,7 +17,7 @@ export default function CopilotDrawer() {
   const [messages, setMessages] = useState([
     {
       sender: 'assistant',
-      html: `<strong>Merhaba Enerji Yöneticisi!</strong><br>Ben <strong>BTC Energy AI Copilot</strong>. Tesisinizin anlık telemetri verilerini, SAP entegrasyonlarını ve anomali analizlerini sizin için izliyorum.<br><br><em>Aşağıdaki hızlı sorulardan birini seçebilir veya sorunuzu yazabilirsiniz:</em>`
+      html: `<strong>Merhaba Enerji Yöneticisi!</strong><br>Ben <strong>BTC Energy AI</strong>. Tesisinizin anlık telemetri verilerini, SAP entegrasyonlarını ve anomali analizlerini sizin için izliyorum.<br><br><em>Aşağıdaki hızlı sorulardan birini seçebilir veya sorunuzu yazabilirsiniz:</em>`
     }
   ]);
   const [inputValue, setInputValue] = useState('');
@@ -81,7 +81,7 @@ export default function CopilotDrawer() {
       Performans hedefin <strong style="color:var(--success-text)">%2.1 altındadır (Başarılı)</strong>.`;
     }
 
-    return `<div style="font-weight:700; color:var(--primary); margin-bottom:6px;">BTC Energy AI Copilot</div>
+    return `<div style="font-weight:700; color:var(--primary); margin-bottom:6px;">BTC Energy AI</div>
     Sorgunuz analiz edildi: "<em>${query}</em>"<br><br>
     Canlı telemetri verilerine göre tesis genelinde toplam 1.18 MW aktif elektrik gücü çekilmektedir. Elektrik ve Su yoğunlukları hedeflenen eşik değerler dahilinde seyrederken, <strong>Hat-2 Doğalgaz hattında</strong> ve <strong>Kompresör-2 basınç seviyesinde</strong> anomali takibi devam etmektedir.`;
   };
@@ -115,8 +115,8 @@ export default function CopilotDrawer() {
             <Sparkles size={18} />
           </div>
           <div>
-            <div>BTC AI Copilot</div>
-            <div style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)' }}>Akıllı Enerji Asistanı (v2.4)</div>
+            <div>BTC Energy AI</div>
+            <div style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)' }}>Akıllı Enerji AI Asistanı</div>
           </div>
         </div>
         <button className="btn-close-copilot" onClick={() => setIsCopilotOpen(false)}>

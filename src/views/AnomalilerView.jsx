@@ -546,7 +546,7 @@ export default function AnomalilerView() {
                     openCopilotWithPrompt(prompt);
                   }}
                 >
-                  <Sparkles size={15} /> Copilot ile Aksiyon Planı
+                  <Sparkles size={15} /> AI ile Aksiyon Planı
                 </button>
                 <button 
                   className="btn btn-primary" 

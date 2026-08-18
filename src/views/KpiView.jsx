@@ -433,7 +433,7 @@ export default function KpiView() {
             <div className="col-span-5" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div className="card-header">
                 <div className="card-title" style={{ fontSize: '15px' }}>
-                  <Sparkles size={18} color="var(--primary)" /> AI Copilot Performans Reçetesi
+                  <Sparkles size={18} color="var(--primary)" /> AI Performans Reçetesi
                 </div>
               </div>
 

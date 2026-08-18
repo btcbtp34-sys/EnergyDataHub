@@ -401,7 +401,7 @@ export default function DashboardView() {
                   style={{ fontSize: '11px', padding: '4px 10px', background: 'var(--danger)', borderColor: 'var(--danger)' }}
                   onClick={() => openCopilotWithPrompt('Hat-2 doğalgaz anomalisi için aksiyon oluştur')}
                 >
-                  <Sparkles size={13} /> Copilot ile Çöz
+                  <Sparkles size={13} /> AI ile Çöz
                 </button>
               </div>
             </div>
